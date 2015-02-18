@@ -10,27 +10,75 @@ import htmlhandling.HTMLParser;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * Created by Jordi Diaz on 12/22/14.
  * Designed to open browser, navigate to status web page, find HTML code for current status of PC's
  * then fetch that specific HTML div and save it locally for parsing by separate class
  */
+
 public class HTMLScraper {
-
-    // URLs for library PC status pages
+    
     private static String libN1 = "http://10.84.89.162/MapViewerTemplateLib.html";
-
-    public static void main(String[] args) throws IOException, SQLException {
+    // Path to HTMLScraper property file
+    private static String propFilePath = "resources/scraper.properties";
+    private static ArrayList<String> labURLs = new ArrayList<String>();
+    private static int threadSleep;
+    private static String localfileName = null;
+    private static String localfilePath = null;
+    // Read properties file
+    private static Properties mainProps = new Properties();
+    
+     
+    @SuppressWarnings("static-access")
+	public static void main(String[] args) throws IOException, SQLException {
+        // Run props
+        getProps();
         // Run first floor, pass in URL
         getHtmlFromPage(libN1);
         // Run htmlhandling.HTMLParser on output from first floor
         HTMLParser parser = new HTMLParser();
         parser.run();
     }
-
+    
+    private void run(){
+    	
+    }
+    
+	private static void getProps() throws IOException {
+		// Read in prop file
+		File propFile = new File(propFilePath);
+		FileInputStream fsInput = new FileInputStream(propFile);
+		// Load prop file into Property object
+		mainProps.load(fsInput);
+		// Retrieve Lab URL
+		labURLs.add(mainProps.getProperty("labURL"));
+			// Test if multiple Lab URL prop is given
+			if(!mainProps.getProperty("labURLsFile").isEmpty()){
+				Properties labURLProps = new Properties();
+				try{
+				File labUrlFile = new File(mainProps.getProperty("labURLsFile").toString());
+				FileInputStream labFileInput = new FileInputStream(labUrlFile);
+				labURLProps.load(labFileInput);
+				}catch(IOException e){
+					System.out.println("Lab URLs File error!");
+					e.printStackTrace();
+				}
+				System.out.println(labURLProps.entrySet());
+			}
+		// Retrieve thread sleep time
+		threadSleep = Integer.parseInt(mainProps.getProperty("threadSleep"));
+		System.out.println("Number of lab URLS provided: " + labURLs.size());
+		System.out.println(labURLs);
+		System.out.println("Thread Sleep is set to: " + threadSleep + " millisecs");
+	}
+    
+    
     // Takes URL for map page, loads map page into memory
     // searches for status div "the-pieces" and saves relevant html locally
     // for parsing
@@ -41,7 +89,7 @@ public class HTMLScraper {
         HtmlPage mapPage = mapClient.getPage(url);
         try {
             // Sleep is necessary for JS on page to execute
-            Thread.sleep(3000);
+            Thread.sleep(threadSleep);
             // Create file to save HTML
             File lib1 = new File("data/raw/libN1");
             // Add HTML to string and write to file

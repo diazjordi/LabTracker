@@ -13,47 +13,49 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import stations.StudentStation;
+
 import com.mysql.jdbc.Statement;
 
 /**
- * Created by Jordi Diaz on 12/22/14.
- * Need to implement ability to read multiple files
- * and delete upon completion, no hard coding.
- * Export arraylist to local file or DB.
+ * Created by Jordi Diaz on 12/22/14. Need to implement ability to read multiple
+ * files and delete upon completion, no hard coding. Export arraylist to local
+ * file or DB.
  */
-
-
+@SuppressWarnings("unused")
 public class HTMLParser {
 
-    // Vars to track units
-    private static int numUnits = 0;
-    private static int numInUse = 0;
-    private static int numAvail = 0;
-    private static int numOffline = 0;
-    // Vars to hold HTML divs
-    private static Elements stationNameDivs;
-    private static Elements statusDivs;
-	//private static Elements osImageDivs;//currently unused
-    // ArrayList to hold parsed and created stations
-    private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
+	// Vars to track units
+	private static int numUnits = 0;
+	private static int numInUse = 0;
+	private static int numAvail = 0;
+	private static int numOffline = 0;
+	// Vars to hold HTML divs
+	private static Elements stationNameDivs;
+	private static Elements statusDivs;
+	// private static Elements osImageDivs;//currently unused
+	// ArrayList to hold parsed and created stations
+	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
 
-    public static void run() throws IOException, SQLException {
-        // parse HTML for needed fields/divs
-        parseHTML();
-        // parse retrieved divs for data, create station stations and place in data structure
-        createStationObjects();
-        // Write out objects to local file
-        writeObjectsToFile(stuStations);
-        // Write to DB
-        writeObjectsToTable(stuStations);
-        // Write to HTML Page
-        writeObjectsToHTMLFile(stuStations);
-    }
+	public static void run() throws IOException, SQLException {
+		// parse HTML for needed fields/divs
+		parseHTML();
+		// parse retrieved divs for data, create station stations and place in
+		// data structure
+		createStationObjects();
+		// Write out objects to local file
+		writeObjectsToFile(stuStations);
+		// Write to DB
+		writeObjectsToTable(stuStations);
+		// Write to HTML Page
+		writeObjectsToHTMLFile(stuStations);
+	}
 
 	/**
 	 * Methods to extract needed fields from HTML These methods are not really
@@ -126,28 +128,31 @@ public class HTMLParser {
 		}
 		return stationStatus;
 	}
-    
-    // Writes station objects to serialized file
-    private static void writeObjectsToFile(ArrayList<StudentStation> stuStations)throws IOException{
-        // Iterate through ArrayList of student stations and write out to file for
-        // use by RSS writer class
-            try{
-            	File output = new File("/workspace/labtracker-back-end/data/parsed/libN1.ser");
-                // Create output stream for parsed objects
-                ObjectOutputStream listOutputStream = new ObjectOutputStream(
-                        new FileOutputStream(output));
-                // Loop to iterate through list of objects
-                for(int i = 0 ; i < stuStations.size(); i++) {
-                    listOutputStream.writeObject(stuStations.get(i).toString());
-                }
-                // Close and clean output stream
-                listOutputStream.flush();
-                listOutputStream.close();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-    }
-    
+
+	// Writes station objects to serialized file
+	private static void writeObjectsToFile(ArrayList<StudentStation> stuStations)
+			throws IOException {
+		// Iterate through ArrayList of student stations and write out to file
+		// for
+		// use by RSS writer class
+		try {
+			File output = new File(
+					"/workspace/labtracker-back-end/data/parsed/libN1.ser");
+			// Create output stream for parsed objects
+			ObjectOutputStream listOutputStream = new ObjectOutputStream(
+					new FileOutputStream(output));
+			// Loop to iterate through list of objects
+			for (int i = 0; i < stuStations.size(); i++) {
+				listOutputStream.writeObject(stuStations.get(i).toString());
+			}
+			// Close and clean output stream
+			listOutputStream.flush();
+			listOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	// Writes station objects to serialized file
 	private static void writeObjectsToHTMLFile(
 			ArrayList<StudentStation> stuStations) throws IOException {
@@ -176,7 +181,7 @@ public class HTMLParser {
 		File newHtmlFile = new File("/var/www/html/librarynorth1st.html");
 		FileUtils.writeStringToFile(newHtmlFile, htmlString);
 	}
-    
+
 	// Writes station objects data to MySQL DB
 	// table: allstationsv1
 	// fields: StationName, StationID, StationStatus, OS, DATE
@@ -221,8 +226,5 @@ public class HTMLParser {
 		}
 		con.close();
 	}
-    
-
-
 
 }
