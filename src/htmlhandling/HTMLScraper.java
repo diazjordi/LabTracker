@@ -27,12 +27,17 @@ public class HTMLScraper {
     private static String libN1 = "http://10.84.89.162/MapViewerTemplateLib.html";
     // Path to HTMLScraper property file
     private static String propFilePath = "resources/scraper.properties";
-    private static ArrayList<String> labURLs = new ArrayList<String>();
+    // Amount of time to sleep while page loads
     private static int threadSleep;
-    private static String localfileName = null;
+    // Path and file name to store  scraped HTML under
     private static String localfilePath = null;
-    // Read properties file
+    private static String localfileName = null;
+    // Main properties
     private static Properties mainProps = new Properties();
+    // Lab URL properties
+    private static Properties labURLProps = new Properties();
+    // Holds all Lab URLs to be scraped
+    private static ArrayList<String> labURLs = new ArrayList<String>();
     
      
     @SuppressWarnings("static-access")
@@ -58,21 +63,23 @@ public class HTMLScraper {
 		mainProps.load(fsInput);
 		// Retrieve Lab URL
 		labURLs.add(mainProps.getProperty("labURL"));
-			// Test if multiple Lab URL prop is given
-			if(!mainProps.getProperty("labURLsFile").isEmpty()){
-				Properties labURLProps = new Properties();
-				try{
+		// Test if multiple Lab URL prop is given
+		if (!mainProps.getProperty("labURLsFile").isEmpty()) {
+			try {
 				File labUrlFile = new File(mainProps.getProperty("labURLsFile").toString());
 				FileInputStream labFileInput = new FileInputStream(labUrlFile);
 				labURLProps.load(labFileInput);
-				}catch(IOException e){
-					System.out.println("Lab URLs File error!");
-					e.printStackTrace();
-				}
-				System.out.println(labURLProps.entrySet());
+			} catch (IOException e) {
+				System.out.println("Lab URLs File error!");
+				e.printStackTrace();
 			}
+		}
 		// Retrieve thread sleep time
 		threadSleep = Integer.parseInt(mainProps.getProperty("threadSleep"));
+		
+		
+		
+		
 		System.out.println("Number of lab URLS provided: " + labURLs.size());
 		System.out.println(labURLs);
 		System.out.println("Thread Sleep is set to: " + threadSleep + " millisecs");
