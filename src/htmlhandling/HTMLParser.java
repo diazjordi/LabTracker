@@ -43,7 +43,7 @@ public class HTMLParser {
 	// ArrayList to hold parsed and created stations
 	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
 
-	public static void run() throws IOException, SQLException {
+	public void run() throws IOException, SQLException {
 		// parse HTML for needed fields/divs
 		parseHTML();
 		// parse retrieved divs for data, create station stations and place in
@@ -68,7 +68,7 @@ public class HTMLParser {
 			 * Load HTML pulled from page into File then load file into Document
 			 * for parsing
 			 */
-			File input = new File("data/raw/libN1");
+			File input = new File("/home/superlib/Desktop/html/rawHTML");
 			Document doc = Jsoup.parse(input, "UTF-8", "");
 			// Create elements out of relevant HTML divs
 			stationNameDivs = doc.getElementsByClass("station-label");
@@ -156,8 +156,7 @@ public class HTMLParser {
 	// Writes station objects to serialized file
 	private static void writeObjectsToHTMLFile(
 			ArrayList<StudentStation> stuStations) throws IOException {
-		File htmlTemplateFile = new File(
-				"/workspace/labtracker-back-end/data/html/lib1template.html");
+		File htmlTemplateFile = new File("/workspace/labtracker-back-end/resources/html/lib1template.html");
 		String htmlString = FileUtils.readFileToString(htmlTemplateFile);
 		StringBuilder list = new StringBuilder();
 		// Append table header
