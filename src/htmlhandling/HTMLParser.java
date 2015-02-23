@@ -31,9 +31,18 @@ import com.mysql.jdbc.Statement;
 @SuppressWarnings("unused")
 public class HTMLParser {
 	
+	// Path to General Prop File
+	private static String generalPropFilePath = "resources/generalprops.properties";
 	// Path to retrieve HTML for parsing
 	private static String scraperOutputPath = null;
-	// Path to store parsed output
+	// Path and file name to store parsed HTML under
+	private static String outputFilePath = null;
+	private static String outputFileName = null;
+	// Path to suppression file
+	private static String suppressionPath = null;
+	// Path to HTML template page
+	private static String htmlTemplePath = null;
+	
 	// Vars to track units
 	private static int numUnits = 0;
 	private static int numInUse = 0;
@@ -47,10 +56,11 @@ public class HTMLParser {
 	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
 
 	public void run() throws IOException, SQLException {
+		// Retrieve Properties
+		getProps();
 		// parse HTML for needed fields/divs
 		parseHTML();
-		// parse retrieved divs for data, create station stations and place in
-		// data structure
+		// parse retrieved divs for data, create station stations and place in data structure
 		createStationObjects();
 		// Write out objects to local file
 		writeObjectsToFile(stuStations);
@@ -59,7 +69,14 @@ public class HTMLParser {
 		// Write to HTML Page
 		writeObjectsToHTMLFile(stuStations);
 	}
-
+	
+	// Get properties from prop files
+	private static void getProps() throws IOException {
+		
+		
+		
+	}
+	
 	/**
 	 * Methods to extract needed fields from HTML These methods are not really
 	 * needed, but structure of HTML may change in the future. May be beneficial

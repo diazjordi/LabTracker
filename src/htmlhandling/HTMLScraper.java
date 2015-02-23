@@ -3,11 +3,7 @@ package htmlhandling;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
-import htmlhandling.HTMLParser;
-
 import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,7 +21,7 @@ import java.util.Properties;
 
 public class HTMLScraper {
    
-	 // Path to general property file
+	// Path to General Prop File
     private static String generalPropFilePath = "resources/generalprops.properties";
     // Main properties
     private static Properties generalProps = new Properties();
@@ -54,8 +50,8 @@ public class HTMLScraper {
     	for(String labURL: labURLs){
     		getHtmlFromPage(labURL);
     		// Run HTMLParser on scraped output 
-            //HTMLParser parser = new HTMLParser();
-            //parser.run();
+            HTMLParser parser = new HTMLParser();
+            parser.run();
     	}
     }
     
