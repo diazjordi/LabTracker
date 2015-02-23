@@ -25,12 +25,15 @@ import com.mysql.jdbc.Statement;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Need to implement ability to read multiple
- * files and delete upon completion, no hard coding. Export arraylist to local
+ * files and delete upon completion, no hard coding. Export ArrayList to local
  * file or DB.
  */
 @SuppressWarnings("unused")
 public class HTMLParser {
-
+	
+	// Path to retrieve HTML for parsing
+	private static String scraperOutputPath = null;
+	// Path to store parsed output
 	// Vars to track units
 	private static int numUnits = 0;
 	private static int numInUse = 0;
@@ -39,7 +42,7 @@ public class HTMLParser {
 	// Vars to hold HTML divs
 	private static Elements stationNameDivs;
 	private static Elements statusDivs;
-	// private static Elements osImageDivs;//currently unused
+	// private static Elements osImageDivs; //currently unused
 	// ArrayList to hold parsed and created stations
 	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
 
@@ -68,7 +71,7 @@ public class HTMLParser {
 			 * Load HTML pulled from page into File then load file into Document
 			 * for parsing
 			 */
-			File input = new File("/home/superlib/Desktop/html/rawHTML");
+			File input = new File("/home/superlib/Desktop/lab-tracker-back-end/html/scraped/scrapedHTML");
 			Document doc = Jsoup.parse(input, "UTF-8", "");
 			// Create elements out of relevant HTML divs
 			stationNameDivs = doc.getElementsByClass("station-label");
@@ -136,8 +139,7 @@ public class HTMLParser {
 		// for
 		// use by RSS writer class
 		try {
-			File output = new File(
-					"/workspace/labtracker-back-end/data/parsed/libN1.ser");
+			File output = new File("/home/superlib/Desktop/html/parsedHTML.ser");
 			// Create output stream for parsed objects
 			ObjectOutputStream listOutputStream = new ObjectOutputStream(
 					new FileOutputStream(output));
