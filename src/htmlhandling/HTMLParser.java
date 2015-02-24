@@ -1,6 +1,7 @@
 package htmlhandling;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -11,6 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,16 +35,19 @@ public class HTMLParser {
 	
 	// Path to General Prop File
 	private static String generalPropFilePath = "resources/generalprops.properties";
+	// Main properties
+    private static Properties generalProps = new Properties();
+    // Main properties
+    private static Properties mainProps = new Properties();
 	// Path to retrieve HTML for parsing
-	private static String scraperOutputPath = null;
+	private static String scraperOutputFilePath = null;
 	// Path and file name to store parsed HTML under
 	private static String outputFilePath = null;
 	private static String outputFileName = null;
 	// Path to suppression file
-	private static String suppressionPath = null;
+	private static String suppressionFilePath = null;
 	// Path to HTML template page
-	private static String htmlTemplePath = null;
-	
+	private static String htmlTemplateFilePath = null;	
 	// Vars to track units
 	private static int numUnits = 0;
 	private static int numInUse = 0;
@@ -57,24 +62,55 @@ public class HTMLParser {
 
 	public void run() throws IOException, SQLException {
 		// Retrieve Properties
+		System.out.println("Retrieving Parser Properties");
 		getProps();
 		// parse HTML for needed fields/divs
+		System.out.println("Parsing HTML For Requested Data");
 		parseHTML();
 		// parse retrieved divs for data, create station stations and place in data structure
+		System.out.println("Creating Station Objects");
 		createStationObjects();
 		// Write out objects to local file
+		System.out.println("Writing Objects To Local Serialized File");
 		writeObjectsToFile(stuStations);
 		// Write to DB
+		System.out.println("Writing Object Data To MYSQL DB");
 		writeObjectsToTable(stuStations);
 		// Write to HTML Page
+		System.out.println("Updating HTML File With Object Data");
 		writeObjectsToHTMLFile(stuStations);
 	}
 	
 	// Get properties from prop files
 	private static void getProps() throws IOException {
-		
-		
-		
+		// Read in general prop file
+		File generalPropFile = new File(generalPropFilePath);
+		FileInputStream generalInputStream = new FileInputStream(generalPropFile);
+		generalProps.load(generalInputStream);
+		String scraperPropPath = generalProps.getProperty("parserPropFile");
+		generalInputStream.close();
+		// Load prop file into main property object
+		File parserPropFile = new File(scraperPropPath);
+		FileInputStream parserInputStream = new FileInputStream(parserPropFile);
+		mainProps.load(parserInputStream);
+		parserInputStream.close();
+		// Retrieve thread sleep time
+		scraperOutputFilePath = mainProps.getProperty("scraperOutputFilePath");
+		// Retrieve local output file path
+		outputFilePath = mainProps.getProperty("outputFilePath");
+		// Retrieve local output file name
+		outputFileName = mainProps.getProperty("outputFileName");
+		// Retrieve local suppression file path
+		suppressionFilePath = mainProps.getProperty("suppressionFilePath");
+		// Retrieve local suppression file path
+		htmlTemplateFilePath = mainProps.getProperty("htmlTemplateFilePath");		
+		// Combine for later use
+		outputFilePath = outputFilePath + outputFileName;
+		// Eventually log all of these out
+		System.out.println("Scraper Parsed Output File Path: " + scraperOutputFilePath);
+		System.out.println("Parser Local Output File Path: " + outputFilePath);
+		System.out.println("Supression File Path: " + suppressionFilePath);
+		System.out.println("HTML Template File Path: " + htmlTemplateFilePath);		
 	}
 	
 	/**
@@ -88,13 +124,12 @@ public class HTMLParser {
 			 * Load HTML pulled from page into File then load file into Document
 			 * for parsing
 			 */
-			File input = new File("/home/superlib/Desktop/lab-tracker-back-end/html/scraped/scrapedHTML");
+			File input = new File(scraperOutputFilePath);
 			Document doc = Jsoup.parse(input, "UTF-8", "");
 			// Create elements out of relevant HTML divs
 			stationNameDivs = doc.getElementsByClass("station-label");
 			statusDivs = doc.getElementsByClass("station");
-			// osImageDivs = doc.getElementsByClass("os-image");//currently
-			// unused
+			// osImageDivs = doc.getElementsByClass("os-image"); //currently unused
 			// Set number of units in lab equal to number of HTML divs
 			numUnits = stationNameDivs.size();
 		} catch (IOException e) {
@@ -119,8 +154,7 @@ public class HTMLParser {
 			String status = getStationStatus(statusDivs.get(k).toString());
 			// Create stations.StudentStation object with extracted data and add
 			// station to ArrayList
-			StudentStation stu1 = new StudentStation(stationName, stationID,
-					status);
+			StudentStation stu1 = new StudentStation(stationName, stationID, status);
 			stuStations.add(k, stu1);
 		}
 	}
@@ -153,10 +187,8 @@ public class HTMLParser {
 	private static void writeObjectsToFile(ArrayList<StudentStation> stuStations)
 			throws IOException {
 		// Iterate through ArrayList of student stations and write out to file
-		// for
-		// use by RSS writer class
 		try {
-			File output = new File("/home/superlib/Desktop/html/parsedHTML.ser");
+			File output = new File(outputFilePath);
 			// Create output stream for parsed objects
 			ObjectOutputStream listOutputStream = new ObjectOutputStream(
 					new FileOutputStream(output));
@@ -172,10 +204,9 @@ public class HTMLParser {
 		}
 	}
 
-	// Writes station objects to serialized file
-	private static void writeObjectsToHTMLFile(
-			ArrayList<StudentStation> stuStations) throws IOException {
-		File htmlTemplateFile = new File("/workspace/labtracker-back-end/resources/html/lib1template.html");
+	// Writes stations to HTML file
+	private static void writeObjectsToHTMLFile( ArrayList<StudentStation> stuStations) throws IOException {
+		File htmlTemplateFile = new File(htmlTemplateFilePath);
 		String htmlString = FileUtils.readFileToString(htmlTemplateFile);
 		StringBuilder list = new StringBuilder();
 		// Append table header
@@ -196,7 +227,7 @@ public class HTMLParser {
 		htmlString = htmlString.replace("$date", date1);
 		htmlString = htmlString.replace("$list", list);
 		htmlString = htmlString.replace("$time", time);
-		File newHtmlFile = new File("/var/www/html/librarynorth1st.html");
+		File newHtmlFile = new File("/var/www/html/StatusPages/librarynorth1st.html");// should be a property
 		FileUtils.writeStringToFile(newHtmlFile, htmlString);
 	}
 
@@ -207,8 +238,7 @@ public class HTMLParser {
 			ArrayList<StudentStation> stuStations) throws IOException,
 			SQLException {
 		// Iterate through ArrayList of student stations and write out to table
-		// for
-		// use by Node.js frontend
+		// for use by Node.js or Apache front end
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {

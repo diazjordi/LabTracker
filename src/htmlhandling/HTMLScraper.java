@@ -38,6 +38,7 @@ public class HTMLScraper {
     private static String outputFileName = null;
     // Holds all Lab URLs to be scraped
     private static ArrayList<String> labURLs = new ArrayList<String>();
+    private static Boolean scrapeSuccess = false;
     
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         run();        
@@ -48,10 +49,15 @@ public class HTMLScraper {
     	getProps();
     	// Iterate through Lab URLs and and scrape
     	for(String labURL: labURLs){
+    		scrapeSuccess = false;
+    		System.out.println("Attempting To Scrape " + labURL);
     		getHtmlFromPage(labURL);
-    		// Run HTMLParser on scraped output 
-            HTMLParser parser = new HTMLParser();
-            parser.run();
+			if (scrapeSuccess) {
+				System.out.println("Scrape Successful, Commencing Parsing");
+				// Run HTMLParser on scraped output
+				HTMLParser parser = new HTMLParser();
+				parser.run();
+			}
     	}
     }
     
@@ -59,14 +65,15 @@ public class HTMLScraper {
 	private static void getProps() throws IOException {
 		// Read in general prop file
 		File generalPropFile = new File(generalPropFilePath);
-		FileInputStream fsInput = new FileInputStream(generalPropFile);
-		generalProps.load(fsInput);
+		FileInputStream generalInputStream = new FileInputStream(generalPropFile);
+		generalProps.load(generalInputStream);
 		String scraperPropPath = generalProps.getProperty("scraperPropFile");
-		fsInput.close();	
+		generalInputStream.close();	
 		// Load prop file into main property object
 		File scraperPropFile = new File(scraperPropPath);
-		FileInputStream	fsInput1 = new FileInputStream(scraperPropFile);
-		mainProps.load(fsInput1);
+		FileInputStream	scraperInputStream = new FileInputStream(scraperPropFile);
+		mainProps.load(scraperInputStream);
+		scraperInputStream.close();
 		// Test for single LabURL or multiple LabURLs property
 		if (!mainProps.getProperty("labURL").isEmpty()) {
 			labURLs.add(mainProps.getProperty("labURL"));
@@ -123,7 +130,7 @@ public class HTMLScraper {
 		System.out.println(labURLs);
 		System.out.println("Thread Sleep Is Set To: " + threadSleep	+ " millisecs");
 		System.out.println("Number Of Times To Attempt Scraping: " + numberOfAttempts);
-		System.out.println("Local File Path: " + outputFilePath);
+		System.out.println("Scraper Local File Path: " + outputFilePath);
 	}
     
     
@@ -169,6 +176,7 @@ public class HTMLScraper {
 						divLoaded = true;
 						// Log out successful scrape
 						System.out.println(url + " contained requested HTML, successfully scraped and written to local file!");
+						scrapeSuccess = true;
 						break;
 					} else {
 						System.out.println(url + " did not contain requested HTML, will try again " + (numberOfAttempts - i)  + " times!");
