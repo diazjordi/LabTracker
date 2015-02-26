@@ -218,8 +218,7 @@ public class HTMLParser {
 		String date1 = dateStamp.format(date).toString();
 		for (StudentStation station : stuStations) {
 			if (station.getStationStatus().matches("Available")) {
-				list.append("<li style=\"color:green\"><h1><b><strong>"
-						+ station.getStationNameShort().toUpperCase()
+				list.append("<li style=\"color:green\"><h1><b><strong>"	+ station.getStationNameShort().toUpperCase()
 						+ "</b></strong></h1></li>");
 			}
 		}

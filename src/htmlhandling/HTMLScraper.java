@@ -45,8 +45,10 @@ public class HTMLScraper {
     }
     
     private static void run() throws IOException, SQLException, InterruptedException{
+    	System.out.println("LabTracker Is Starting!");
     	// Retrieve props
     	getProps();
+    	System.out.println("Starting Scraping Process, Properties Set");
     	// Iterate through Lab URLs and and scrape
     	for(String labURL: labURLs){
     		scrapeSuccess = false;
@@ -59,6 +61,7 @@ public class HTMLScraper {
 				parser.run();
 			}
     	}
+    	System.out.println("LabTracker has completed process, shutting down!!");
     }
     
 	@SuppressWarnings("rawtypes")
