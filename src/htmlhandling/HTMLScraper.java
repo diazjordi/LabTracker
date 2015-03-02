@@ -22,7 +22,7 @@ import java.util.Properties;
 public class HTMLScraper {
    
 	// Path to General Prop File
-    private static String generalPropFilePath = "resources/generalprops.properties";
+    private static String generalPropFilePath = "/home/superlib/Desktop/generalprops.properties";
     // Main properties
     private static Properties generalProps = new Properties();
     // Main properties

@@ -34,7 +34,7 @@ import com.mysql.jdbc.Statement;
 public class HTMLParser {
 	
 	// Path to General Prop File
-	private static String generalPropFilePath = "resources/generalprops.properties";
+	private static String generalPropFilePath = "/home/superlib/Desktop/generalprops.properties";
 	// Main properties
     private static Properties generalProps = new Properties();
     // Main properties
@@ -251,8 +251,8 @@ public class HTMLParser {
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
 			// empty table
-			String empty = "TRUNCATE TABLE allstationsv1";
-			stmt.executeUpdate(empty);
+//			String empty = "TRUNCATE TABLE allstationsv1";
+//			stmt.executeUpdate(empty);
 			for (StudentStation station : stuStations) {
 				String query = "INSERT INTO allstationsv1 (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
 						+ " VALUES ('"
