@@ -209,16 +209,24 @@ public class HTMLParser {
 		File htmlTemplateFile = new File(htmlTemplateFilePath);
 		String htmlString = FileUtils.readFileToString(htmlTemplateFile);
 		StringBuilder list = new StringBuilder();
+		for(StudentStation station: stuStations){
+			if(station.getStationName().matches("ec-pg9-ln1000")){
+				stuStations.remove(station);
+				System.out.println(station.getStationNameShort() + " removed!");
+				break;
+			}
+		}
 		// Append table header
 		list.append("<ul style=\"list-style-type:none\">");
 		Date date = new Date();
-		DateFormat timeStamp = new SimpleDateFormat("h:mm a");
+		DateFormat timeStamp = new SimpleDateFormat("h:mm:ss a");
 		DateFormat dateStamp = new SimpleDateFormat("E, MMM dd");
 		String time = timeStamp.format(date).toString();
 		String date1 = dateStamp.format(date).toString();
 		for (StudentStation station : stuStations) {
 			if (station.getStationStatus().matches("Available")) {
-				list.append("<li style=\"color:green\"><h1><b><strong>"	+ station.getStationNameShort().toUpperCase()
+				list.append("<li style=\"color:green\"><h1><b><strong>"
+						+ station.getStationNameShort().toUpperCase()
 						+ "</b></strong></h1></li>");
 			}
 		}

@@ -39,6 +39,7 @@ public class HTMLScraper {
     // Holds all Lab URLs to be scraped
     private static ArrayList<String> labURLs = new ArrayList<String>();
     private static Boolean scrapeSuccess = false;
+    protected static String currentLab = null;
     
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         run();        
@@ -141,6 +142,8 @@ public class HTMLScraper {
     // searches for status div "the-pieces" and saves relevant html locally
     // for parsing
 	private static void getHtmlFromPage(String url) throws IOException,	InterruptedException {
+		
+		
 		// To keep track of whether loads are successful
 		Boolean pageLoaded = true;
 		Boolean divLoaded = false;
