@@ -60,25 +60,26 @@ public class HTMLParser {
 	// ArrayList to hold parsed and created stations
 	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
 
-	public void run() throws IOException, SQLException {
+	public void run(String currentLab) throws IOException, SQLException {
 		// Retrieve Properties
-		System.out.println("Retrieving Parser Properties");
-		getProps();
+			System.out.println("Retrieving Parser Properties");
+				getProps();
 		// parse HTML for needed fields/divs
-		System.out.println("Parsing HTML For Requested Data");
-		parseHTML();
+			System.out.println("Parsing HTML For Requested Data");
+				parseHTML();
 		// parse retrieved divs for data, create station stations and place in data structure
-		System.out.println("Creating Station Objects");
-		createStationObjects();
-		// Write out objects to local file
-		System.out.println("Writing Objects To Local Serialized File");
-		writeObjectsToFile(stuStations);
-		// Write to DB
-		System.out.println("Writing Object Data To MYSQL DB");
-		writeObjectsToTable(stuStations);
+			System.out.println("Creating Station Objects");
+				createStationObjects();
 		// Write to HTML Page
-		System.out.println("Updating HTML File With Object Data");
-		writeObjectsToHTMLFile(stuStations);
+			System.out.println("Updating HTML File With Object Data");
+				//writeObjectsToHTMLFile(stuStations);
+		// Write to DB
+			System.out.println("Writing Object Data To MYSQL DB");
+				//writeObjectsToTable(stuStations);
+		// Write out objects to local file
+			System.out.println("Writing Objects To Local Serialized File");
+				//writeObjectsToFile(stuStations);
+		
 	}
 	
 	// Get properties from prop files
@@ -183,27 +184,6 @@ public class HTMLParser {
 		return stationStatus;
 	}
 
-	// Writes station objects to serialized file
-	private static void writeObjectsToFile(ArrayList<StudentStation> stuStations)
-			throws IOException {
-		// Iterate through ArrayList of student stations and write out to file
-		try {
-			File output = new File(outputFilePath);
-			// Create output stream for parsed objects
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(
-					new FileOutputStream(output));
-			// Loop to iterate through list of objects
-			for (int i = 0; i < stuStations.size(); i++) {
-				listOutputStream.writeObject(stuStations.get(i).toString());
-			}
-			// Close and clean output stream
-			listOutputStream.flush();
-			listOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	// Writes stations to HTML file
 	private static void writeObjectsToHTMLFile( ArrayList<StudentStation> stuStations) throws IOException {
 		File htmlTemplateFile = new File(htmlTemplateFilePath);
@@ -280,6 +260,27 @@ public class HTMLParser {
 			ex.printStackTrace();
 		}
 		con.close();
+	}
+
+	// Writes station objects to serialized file
+	private static void writeObjectsToFile(ArrayList<StudentStation> stuStations)
+			throws IOException {
+		// Iterate through ArrayList of student stations and write out to file
+		try {
+			File output = new File(outputFilePath);
+			// Create output stream for parsed objects
+			ObjectOutputStream listOutputStream = new ObjectOutputStream(
+					new FileOutputStream(output));
+			// Loop to iterate through list of objects
+			for (int i = 0; i < stuStations.size(); i++) {
+				listOutputStream.writeObject(stuStations.get(i).toString());
+			}
+			// Close and clean output stream
+			listOutputStream.flush();
+			listOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

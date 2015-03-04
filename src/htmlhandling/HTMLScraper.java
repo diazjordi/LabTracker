@@ -3,7 +3,9 @@ package htmlhandling;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
 import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,6 +13,9 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -37,7 +42,8 @@ public class HTMLScraper {
     private static String outputFilePath = null;
     private static String outputFileName = null;
     // Holds all Lab URLs to be scraped
-    private static ArrayList<String> labURLs = new ArrayList<String>();
+    //private static ArrayList<String> labURLs = new ArrayList<String>();
+    private static Map<String, String> labURLs = new HashMap<String, String>();
     private static Boolean scrapeSuccess = false;
     protected static String currentLab = null;
     
@@ -45,21 +51,24 @@ public class HTMLScraper {
         run();        
     }
     
-    private static void run() throws IOException, SQLException, InterruptedException{
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private static void run() throws IOException, SQLException, InterruptedException{
     	System.out.println("LabTracker Is Starting!");
     	// Retrieve props
     	getProps();
     	System.out.println("Starting Scraping Process, Properties Set");
     	// Iterate through Lab URLs and and scrape
-    	for(String labURL: labURLs){
+    	Iterator it = labURLs.entrySet().iterator();
+    	while(it.hasNext()){
+    		Map.Entry<String, String> pair =(Map.Entry<String, String>)it.next();
     		scrapeSuccess = false;
-    		System.out.println("Attempting To Scrape " + labURL);
-    		getHtmlFromPage(labURL);
+    		System.out.println("Attempting To Scrape " + pair.getValue());
+    		getHtmlFromPage(pair.getValue());
 			if (scrapeSuccess) {
 				System.out.println("Scrape Successful, Commencing Parsing");
 				// Run HTMLParser on scraped output
 				HTMLParser parser = new HTMLParser();
-				parser.run();
+				parser.run(pair.getKey());
 			}
     	}
     	System.out.println("LabTracker has completed process, shutting down!!");
@@ -78,10 +87,8 @@ public class HTMLScraper {
 		FileInputStream	scraperInputStream = new FileInputStream(scraperPropFile);
 		mainProps.load(scraperInputStream);
 		scraperInputStream.close();
-		// Test for single LabURL or multiple LabURLs property
-		if (!mainProps.getProperty("labURL").isEmpty()) {
-			labURLs.add(mainProps.getProperty("labURL"));
-		} else if (!mainProps.getProperty("labURLsFile").isEmpty()) { // Check for LabURLs property file
+		// Test for LabURLs property
+		if (!mainProps.getProperty("labURLsFile").isEmpty()) {
 			try {
 				File labUrlFile = new File(mainProps.getProperty("labURLsFile"));
 				FileInputStream labFileInput = new FileInputStream(labUrlFile);
@@ -89,20 +96,31 @@ public class HTMLScraper {
 				Enumeration labURLKeys = labURLProps.keys();
 				while (labURLKeys.hasMoreElements()) { // Iterate through props
 					String labProp = labURLKeys.nextElement().toString();
-					if (!labURLProps.getProperty(labProp).isEmpty()) { 
-						labURLs.add(labURLProps.getProperty(labProp));
+					if (!labURLProps.getProperty(labProp).isEmpty()) {
+						labURLs.put(labProp, labURLProps.getProperty(labProp));
 					} else if (labURLProps.getProperty(labProp).isEmpty()) {
 						// Log error for Lab URL
-						System.out.println("URL for " + labProp	+ " lab was not given!");
+						System.out.println("URL for " + labProp
+								+ " lab was not given!");
 					}
+					// if (!labURLProps.getProperty(labProp).isEmpty()) {
+					// labURLs.add(labURLProps.getProperty(labProp));
+					// } else if (labURLProps.getProperty(labProp).isEmpty()) {
+					// // Log error for Lab URL
+					// System.out.println("URL for " + labProp +
+					// " lab was not given!");
+					// }
 				}
 			} catch (IOException e) {
 				System.out.println("Lab URLs File error!");
 				e.printStackTrace();
 			}
+		} else if (mainProps.getProperty("labURLsFile").isEmpty()) {
+			System.out.println("No Lab URL File path given!");
 		} else { // Catches no LabURLs error
 			System.out.println("No Lab URLs properties given!");
-			System.out.println("Program can not continue successfully, must exit!");
+			System.out
+					.println("Program can not continue successfully, must exit!");
 			System.exit(0);
 		}
 		// Remove labURL props as they were already handled
