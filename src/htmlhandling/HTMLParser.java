@@ -72,13 +72,13 @@ public class HTMLParser {
 				createStationObjects();
 		// Write to HTML Page
 			System.out.println("Updating HTML File With Object Data");
-				//writeObjectsToHTMLFile(stuStations);
+				writeObjectsToHTMLFile(stuStations);
 		// Write to DB
 			System.out.println("Writing Object Data To MYSQL DB");
-				//writeObjectsToTable(stuStations);
+				writeObjectsToTable(stuStations);
 		// Write out objects to local file
 			System.out.println("Writing Objects To Local Serialized File");
-				//writeObjectsToFile(stuStations);
+				writeObjectsToFile(stuStations);
 		
 	}
 	
@@ -199,7 +199,7 @@ public class HTMLParser {
 		// Append table header
 		list.append("<ul style=\"list-style-type:none\">");
 		Date date = new Date();
-		DateFormat timeStamp = new SimpleDateFormat("h:mm:ss a");
+		DateFormat timeStamp = new SimpleDateFormat("h:mm a");
 		DateFormat dateStamp = new SimpleDateFormat("E, MMM dd");
 		String time = timeStamp.format(date).toString();
 		String date1 = dateStamp.format(date).toString();
