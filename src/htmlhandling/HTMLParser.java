@@ -72,13 +72,13 @@ public class HTMLParser {
 				createStationObjects();
 		// Write to HTML Page
 			System.out.println("Updating HTML File With Object Data");
-				writeObjectsToHTMLFile(stuStations);
+				//writeObjectsToHTMLFile(stuStations);
 		// Write to DB
 			System.out.println("Writing Object Data To MYSQL DB");
-				writeObjectsToTable(stuStations);
+				//writeObjectsToTable(stuStations);
 		// Write out objects to local file
 			System.out.println("Writing Objects To Local Serialized File");
-				writeObjectsToFile(stuStations);
+				//writeObjectsToFile(stuStations);
 		
 	}
 	
