@@ -3,11 +3,9 @@ package htmlhandling;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,9 +41,10 @@ public class HTMLScraper {
     private static String outputFilePath = null;
     private static String outputFileName = null;
     // Holds all Lab URLs to be scraped
-    //private static ArrayList<String> labURLs = new ArrayList<String>();
     private static Map<String, String> labURLs = new HashMap<String, String>();
+    // Determines Whether To Attempt Parsing
     private static Boolean scrapeSuccess = false;
+    // Name Of Current Lab being Scraped & Parsed
     protected static String currentLab = null;
     // Logger
     private static Logger log = Logger.getLogger(HTMLScraper.class);
@@ -53,30 +52,31 @@ public class HTMLScraper {
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         // Configure Logger
     	BasicConfigurator.configure();
+    	// Run HTMLScraper
     	run();        
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	private static void run() throws IOException, SQLException, InterruptedException{
-    	log.debug("LabTracker Is Starting!");
+    	log.trace("LabTracker Is Starting!");
     	// Retrieve props
     	getProps();
-    	log.debug("Starting Scraping Process, Properties Set");
-    	// Iterate through Lab URLs and and scrape
+    	log.trace("Starting Scraping Process, Properties Set");
+    	// Iterate through Lab URLs and parse
     	Iterator it = labURLs.entrySet().iterator();
     	while(it.hasNext()){
     		Map.Entry<String, String> pair =(Map.Entry<String, String>)it.next();
     		scrapeSuccess = false;
-    		log.debug("Attempting To Scrape " + pair.getValue());
+    		log.trace("Attempting To Scrape " + pair.getValue());
     		getHtmlFromPage(pair.getValue());
 			if (scrapeSuccess) {
-				log.debug("Scrape Successful, Commencing Parsing");
+				log.trace("Scrape Successful, Commencing Parsing");
 				// Run HTMLParser on scraped output
 				HTMLParser parser = new HTMLParser();
 				parser.run(pair.getKey());
 			}
     	}
-    	log.debug("LabTracker has completed process, shutting down!!");
+    	log.trace("LabTracker has completed process, shutting down!!");
     }
     
 	@SuppressWarnings("rawtypes")
@@ -105,18 +105,18 @@ public class HTMLScraper {
 						labURLs.put(labProp, labURLProps.getProperty(labProp));
 					} else if (labURLProps.getProperty(labProp).isEmpty()) {
 						// Log error for Lab URL
-						log.debug("URL for " + labProp+ " lab was not given!");
+						log.warn("URL for " + labProp+ " lab was not given!");
 					}
 				}
 			} catch (IOException e) {
-				log.debug("Lab URLs File error!");
+				log.error("Lab URLs File error!");
 				e.printStackTrace();
 			}
 		} else if (mainProps.getProperty("labURLsFile").isEmpty()) {
-			log.debug("No Lab URL File path given!");
+			log.warn("No Lab URL File path given!");
 		} else { // Catches no LabURLs error
-			log.debug("No Lab URLs properties given!");
-			log.debug("Program can not continue successfully, must exit!");
+			log.error("No Lab URLs properties given!");
+			log.fatal("Program can not continue successfully, must exit!");
 			System.exit(0);
 		}
 		// Remove labURL props as they were already handled
@@ -127,8 +127,8 @@ public class HTMLScraper {
 		while (mainPropKeys.hasMoreElements()) { // Iterate through props
 			String prop = mainPropKeys.nextElement().toString();
 			if (mainProps.getProperty(prop).isEmpty()) { // If prop value log error
-				log.debug("No value given for " + prop + " property");
-				log.debug("Program can not continue successfuly, must exit!");
+				log.error("No value given for " + prop + " property");
+				log.fatal("Program can not continue successfuly, must exit!");
 				System.exit(0);
 			}
 		}
@@ -143,11 +143,11 @@ public class HTMLScraper {
 		// Combine for later use
 		outputFilePath = outputFilePath + outputFileName;
 		// Eventually log all of these out
-		log.debug("Number Of Lab URLs provided: " + labURLs.size());
-		log.debug(labURLs);
-		log.debug("Thread Sleep Is Set To: " + threadSleep	+ " millisecs");
-		log.debug("Number Of Times To Attempt Scraping: " + numberOfAttempts);
-		log.debug("Scraper Local File Path: " + outputFilePath);
+		log.info("Number Of Lab URLs provided: " + labURLs.size());
+		log.info(labURLs);
+		log.info("Thread Sleep Is Set To: " + threadSleep	+ " millisecs");
+		log.info("Number Of Times To Attempt Scraping: " + numberOfAttempts);
+		log.info("Scraper Local File Path: " + outputFilePath);
 	}
     
     
@@ -155,8 +155,6 @@ public class HTMLScraper {
     // searches for status div "the-pieces" and saves relevant html locally
     // for parsing
 	private static void getHtmlFromPage(String url) throws IOException,	InterruptedException {
-		
-		
 		// To keep track of whether loads are successful
 		Boolean pageLoaded = true;
 		Boolean divLoaded = false;
@@ -169,7 +167,7 @@ public class HTMLScraper {
 			mapPage = mapClient.getPage(url);
 		} catch (UnknownHostException a) {
 			// Log out error
-			log.debug("Unknown Host Exception for: " + url);
+			log.error("Unknown Host Exception for: " + url);
 			// Update Boolean to direct rest of process
 			pageLoaded = false;
 			// Close current web client
@@ -194,19 +192,18 @@ public class HTMLScraper {
 						// Update Boolean
 						divLoaded = true;
 						// Log out successful scrape
-						log.debug(url + " contained requested HTML, successfully scraped and written to local file!");
+						log.info(url + " contained requested HTML, successfully scraped and written to local file!");
 						scrapeSuccess = true;
 						break;
 					} else {
-						log.debug(url + " did not contain requested HTML, will try again " + (numberOfAttempts - i)  + " times!");
+						log.warn(url + " did not contain requested HTML, will try again " + (numberOfAttempts - i)  + " times!");
 					}
 				}
 			}
 			// If no data was found update Boolean and log error
 			if(!divLoaded){
-				log.debug(url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!");
+				log.warn(url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!");
 			}
 		}
 	}
-
 }

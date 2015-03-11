@@ -66,19 +66,19 @@ public class StudentStation implements Serializable {
         return os;
     }
 
-    protected void setStationName(String stationNameIN){
+    public void setStationName(String stationNameIN){
         this.stationName = stationNameIN;
     }
 
-    protected void setStationID(String stationIDIN){
+    public void setStationID(String stationIDIN){
         this.stationName = stationIDIN;
     }
 
-    protected void setStationStatus(String stationStatusIN){
+    public void setStationStatus(String stationStatusIN){
         this.stationName = stationStatusIN;
     }
 
-    protected void setStationOS(String osIN){
+    public void setStationOS(String osIN){
         this.os = osIN;
     }
 
