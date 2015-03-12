@@ -30,31 +30,33 @@ import com.mysql.jdbc.Statement;
  * files and delete upon completion, no hard coding. Export ArrayList to local
  * file or DB.
  */
+@SuppressWarnings("unused")
 public class HTMLParser {
 	
 	// Path to General Prop File
-	private static String generalPropFilePath = "/home/superlib/Desktop/generalprops.properties";
-	// Main properties
-    private static Properties generalProps = new Properties();
+	private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties mainProps = new Properties();
 	// Path to retrieve HTML for parsing
-	private static String scraperOutputFilePath = null;
+	private static String scraperOutputPath = null;
 	// Path and file name to store parsed HTML under
-	private static String outputFilePath = null;
-	private static String outputFileName = null;
+	private static String parserOutputPath = null;
 	// Path to suppression file
 	private static String suppressionFilePath = null;
-	// Path to HTML template page
-	private static String htmlTemplateFilePath = null;	
+	// Paths to HTML template pages
+	private static String htmlListTemplateFilePath = null;
+	private static String htmlMapTemplateFilePath = null;
+	// Path to output HTML pages
+	private static String htmlListOutputPath = null;
+	private static String htmlMapOutputPath = null;
 	// Vars to track units
-	private static Integer numUnits = 0;
+	private static Integer numUnits = 0;	
 	private static Integer numInUse = 0;
 	private static Integer numAvail = 0;
 	private static Integer numOffline = 0;
 	// Vars to hold HTML divs
 	private static Elements stationNameDivs;
-	private static Elements statusDivs;
+	private static Elements statusDivs;	
 	private static Elements osImageDivs; //currently unused
 	// ArrayList to hold parsed and created stations
 	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
@@ -69,9 +71,12 @@ public class HTMLParser {
 		// parse retrieved divs for data, create station stations and place in data structure
 			System.out.println("Creating Station Objects");
 				createStationObjects();
-		// Write to HTML Page
-			System.out.println("Updating HTML File With Object Data");
-				writeListOfStationsToHTMLFile(stuStations);
+		// Write to HTML List Page
+			System.out.println("Updating HTML List With Object Data");
+				writeListOfStationsToHTML(stuStations);
+		// Write to HTML Map Page
+			System.out.println("Updating HTML Map With Object Data");
+			writeMapOfStationsToHTML(stuStations);
 		// Write to DB
 			System.out.println("Writing Object Data To MYSQL DB");
 				writeObjectsToTable(stuStations);
@@ -82,34 +87,32 @@ public class HTMLParser {
 	
 	// Get properties from prop files
 	private static void getProps() throws IOException {
-		// Read in general prop file
-		File generalPropFile = new File(generalPropFilePath);
-		FileInputStream generalInputStream = new FileInputStream(generalPropFile);
-		generalProps.load(generalInputStream);
-		String scraperPropPath = generalProps.getProperty("parserPropFile");
-		generalInputStream.close();
+		String scraperPropPath = propFilePath;
 		// Load prop file into main property object
 		File parserPropFile = new File(scraperPropPath);
 		FileInputStream parserInputStream = new FileInputStream(parserPropFile);
 		mainProps.load(parserInputStream);
 		parserInputStream.close();
 		// Retrieve thread sleep time
-		scraperOutputFilePath = mainProps.getProperty("scraperOutputFilePath");
+		scraperOutputPath = mainProps.getProperty("scraperOutputPath");
 		// Retrieve local output file path
-		outputFilePath = mainProps.getProperty("outputFilePath");
-		// Retrieve local output file name
-		outputFileName = mainProps.getProperty("outputFileName");
+		parserOutputPath = mainProps.getProperty("parserOutputPath");
 		// Retrieve local suppression file path
 		suppressionFilePath = mainProps.getProperty("suppressionFilePath");
-		// Retrieve local suppression file path
-		htmlTemplateFilePath = mainProps.getProperty("htmlTemplateFilePath");		
-		// Combine for later use
-		outputFilePath = outputFilePath + outputFileName;
+		// Retrieve local template paths
+		htmlListTemplateFilePath = mainProps.getProperty("htmlListTemplateFilePath");
+		htmlMapTemplateFilePath = mainProps.getProperty("htmlMapTemplateFilePath");
+		// Retrieve output paths for HTML
+		htmlListOutputPath = mainProps.getProperty("htmlListOutputPath");
+		htmlMapOutputPath = mainProps.getProperty("htmlMapOutputPath");
 		// Eventually log all of these out
-		System.out.println("Scraper Output File Path: " + scraperOutputFilePath);
-		System.out.println("Parser Local Output File Path: " + outputFilePath);
+		System.out.println("Scraper Output File Path: " + scraperOutputPath);
+		System.out.println("Parser Local Output File Path: " + parserOutputPath);
 		System.out.println("Supression File Path: " + suppressionFilePath);
-		System.out.println("HTML Template File Path: " + htmlTemplateFilePath);		
+		System.out.println("HTML List Template File Path: " + htmlListTemplateFilePath);	
+		System.out.println("HTML Map Template File Path: " + htmlMapTemplateFilePath);
+		System.out.println("HTML List Output Path: " + htmlListOutputPath);
+		System.out.println("HTML Map Output Path: " + htmlMapOutputPath);
 	}
 	
 	/**
@@ -122,7 +125,7 @@ public class HTMLParser {
 			/** Load HTML pulled from page into File then load file into Document
 			 * for parsing
 			 */
-			File input = new File(scraperOutputFilePath);
+			File input = new File(scraperOutputPath);
 			Document doc = Jsoup.parse(input, "UTF-8", "");
 			// Create elements out of relevant HTML divs
 			stationNameDivs = doc.getElementsByClass("station-label");
@@ -183,18 +186,21 @@ public class HTMLParser {
 	}
 
 	// Writes stations to HTML file
-	private static void writeListOfStationsToHTMLFile( ArrayList<StudentStation> stuStations) throws IOException {
-		File htmlTemplateFile = new File(htmlTemplateFilePath);
-		String htmlString = FileUtils.readFileToString(htmlTemplateFile);
-		StringBuilder list = new StringBuilder();
-		for(StudentStation station: stuStations){
-			if(station.getStationName().matches("ec-pg9-ln1000")){
+	private static void writeListOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
+		// Suppresses G9
+		for (StudentStation station : stuStations) {
+			if (station.getStationName().matches("ec-pg9-ln1000")) {
 				stuStations.remove(station);
+				numAvail--;
 				station.setStationStatus("Suppressed");
 				System.out.println(station.getStationNameShort() + " removed!");
 				break;
 			}
 		}
+		File htmlTemplateFile = new File(htmlListTemplateFilePath);
+		String htmlString = FileUtils.readFileToString(htmlTemplateFile);
+		StringBuilder list = new StringBuilder();
+		
 		// Append table header
 		list.append("<ul style=\"list-style-type:none\">");
 		Date date = new Date();
@@ -215,9 +221,29 @@ public class HTMLParser {
 		htmlString = htmlString.replace("$time", time);
 		htmlString = htmlString.replace("$numAvail", numAvail.toString());
 		htmlString = htmlString.replace("$numUnits", numUnits.toString());
-		File newHtmlFile = new File("/var/www/html/StatusPages/librarynorth1st.html");// should be a property
+		File newHtmlFile = new File(htmlListOutputPath);
 		FileUtils.writeStringToFile(newHtmlFile, htmlString);
 	}
+	
+		// Writes stations to HTML Map File
+	private static void writeMapOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
+			File htmlMapTemplateFile = new File(htmlMapTemplateFilePath);
+			String htmlString = FileUtils.readFileToString(htmlMapTemplateFile);
+			// Available Color String
+			String availColor = "<FONT COLOR=\"#ffcb2f\">";
+			String begMatch = "<!--$";
+			String endMatch ="-->";
+			for (StudentStation station : stuStations) {				
+				if (station.getStationStatus().matches("Available")) {
+					String completeMatch = begMatch + station.getStationNameShort() + endMatch;
+					if(htmlString.contains(completeMatch)){
+						htmlString = htmlString.replace(completeMatch, availColor);
+					}					
+				}
+			}
+			File newHtmlFile = new File(htmlMapOutputPath);// should be a property
+			FileUtils.writeStringToFile(newHtmlFile, htmlString);
+		}
 
 	// Writes station objects data to MySQL DB
 	// table: allstationsv1
@@ -238,22 +264,10 @@ public class HTMLParser {
 				"jdbc:mysql://localhost:3306/labtracker", "root", "MS2LflD?5");
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			// empty table
-//			String empty = "TRUNCATE TABLE allstationsv1";
-//			stmt.executeUpdate(empty);
 			for (StudentStation station : stuStations) {
 				String query = "INSERT INTO allstationsv1 (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-						+ " VALUES ('"
-						+ station.getStationNameShort()
-						+ "','"
-						+ station.getStationName()
-						+ "','"
-						+ station.getStationID()
-						+ "','"
-						+ station.getStationStatus()
-						+ "','"
-						+ station.getStationOS() + "', NOW())";
-				// System.out.println(query);
+						+ " VALUES ('" + station.getStationNameShort()	+ "','"	+ station.getStationName() + "','" 
+						+ station.getStationID() + "','"	+ station.getStationStatus() + "','" + station.getStationOS() + "', NOW())";
 				stmt.executeUpdate(query);
 			}
 		} catch (SQLException ex) {
@@ -263,11 +277,10 @@ public class HTMLParser {
 	}
 
 	// Writes station objects to serialized file
-	private static void writeObjectsToFile(ArrayList<StudentStation> stuStations)
-			throws IOException {
+	private static void writeObjectsToFile(ArrayList<StudentStation> stuStations) throws IOException {
 		// Iterate through ArrayList of student stations and write out to file
 		try {
-			File output = new File(outputFilePath);
+			File output = new File(parserOutputPath);
 			// Create output stream for parsed objects
 			ObjectOutputStream listOutputStream = new ObjectOutputStream(
 					new FileOutputStream(output));

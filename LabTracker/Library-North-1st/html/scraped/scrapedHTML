@@ -1,0 +1,320 @@
+<div style="width: 1100px; height: 600px;" id="the-pieces">
+  <div style="left: 640px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1049">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 659px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 592px; top: 472px;" class="station-label">
+    ec-pg9-ln1000
+  </div>
+  <div style="left: 479px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1050">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 498px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 431px; top: 472px;" class="station-label">
+    ec-pg7-ln1000
+  </div>
+  <div style="left: 170px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1051">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 189px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 122px; top: 472px;" class="station-label">
+    ec-pg3-ln1000
+  </div>
+  <div style="left: 170px; top: 370px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1052">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 189px; top: 367px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 122px; top: 402px;" class="station-label">
+    ec-pf3-ln1000
+  </div>
+  <div style="left: 326px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1053">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 345px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 278px; top: 472px;" class="station-label">
+    ec-pg5-ln1000
+  </div>
+  <div style="left: 92px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1054">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 111px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 44px; top: 472px;" class="station-label">
+    ec-pg2-ln1000
+  </div>
+  <div style="left: 247px; top: 370px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1055">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 266px; top: 367px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 199px; top: 402px;" class="station-label">
+    ec-pf4-ln1000
+  </div>
+  <div style="left: 92px; top: 370px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1056">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 111px; top: 367px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 44px; top: 402px;" class="station-label">
+    ec-pf2-ln1000
+  </div>
+  <div style="left: 560px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1057">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 579px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 512px; top: 342px;" class="station-label">
+    ec-pe8-ln1000
+  </div>
+  <div style="left: 326px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1058">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 345px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 278px; top: 342px;" class="station-label">
+    ec-pe5-ln1000
+  </div>
+  <div style="left: 170px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1059">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 189px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 122px; top: 342px;" class="station-label">
+    ec-pe3-ln1000
+  </div>
+  <div style="left: 22px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1060">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 41px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: -26px; top: 342px;" class="station-label">
+    ec-pe1-ln1000
+  </div>
+  <div style="left: 479px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1061">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 498px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 431px; top: 282px;" class="station-label">
+    ec-pd7-ln1000
+  </div>
+  <div style="left: 326px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1062">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 345px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 278px; top: 282px;" class="station-label">
+    ec-pd5-ln1000
+  </div>
+  <div style="left: 170px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1063">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 189px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 122px; top: 282px;" class="station-label">
+    ec-pd3-ln1000
+  </div>
+  <div style="left: 22px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1064">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 41px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: -26px; top: 282px;" class="station-label">
+    ec-pd1-ln1000
+  </div>
+  <div style="left: 479px; top: 190px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1065">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 498px; top: 187px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 431px; top: 222px;" class="station-label">
+    ec-pc7-ln1000
+  </div>
+  <div style="left: 326px; top: 190px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1066">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 345px; top: 187px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 278px; top: 222px;" class="station-label">
+    ec-pc5-ln1000
+  </div>
+  <div style="left: 170px; top: 190px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1067">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 189px; top: 187px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 122px; top: 222px;" class="station-label">
+    ec-pc3-ln1000
+  </div>
+  <div style="left: 479px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1068">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 498px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 431px; top: 162px;" class="station-label">
+    ec-pb7-ln1000
+  </div>
+  <div style="left: 247px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1069">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 266px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 199px; top: 162px;" class="station-label">
+    ec-pb4-ln1000
+  </div>
+  <div style="left: 92px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1070">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 111px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 44px; top: 162px;" class="station-label">
+    ec-pb2-ln1000
+  </div>
+  <div style="left: 560px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1071">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 579px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 512px; top: 102px;" class="station-label">
+    ec-pa8-ln1000
+  </div>
+  <div style="left: 402px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1072">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 421px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 354px; top: 102px;" class="station-label">
+    ec-pa6-ln1000
+  </div>
+  <div style="left: 170px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1073">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 189px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 122px; top: 102px;" class="station-label">
+    ec-pa3-ln1000
+  </div>
+  <div style="left: 22px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1074">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 41px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: -26px; top: 102px;" class="station-label">
+    ec-pa1-ln1000
+  </div>
+  <div style="left: 479px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1108">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 498px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 431px; top: 102px;" class="station-label">
+    ec-pa7-ln1000
+  </div>
+  <div style="left: 326px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1109">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 345px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 278px; top: 102px;" class="station-label">
+    ec-pa5-ln1000
+  </div>
+  <div style="left: 247px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1110">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 266px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 199px; top: 102px;" class="station-label">
+    ec-pa4-ln1000
+  </div>
+  <div style="left: 92px; top: 70px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1111">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 111px; top: 67px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 44px; top: 102px;" class="station-label">
+    ec-pa2-ln1000
+  </div>
+  <div style="left: 560px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1112">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 579px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 512px; top: 472px;" class="station-label">
+    ec-pg8-ln1000
+  </div>
+  <div style="left: 402px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1113">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 421px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 354px; top: 472px;" class="station-label">
+    ec-pg6-ln1000
+  </div>
+  <div style="left: 247px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1114">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 266px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 199px; top: 472px;" class="station-label">
+    ec-pg4-ln1000
+  </div>
+  <div style="left: 22px; top: 440px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1115">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 41px; top: 437px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: -26px; top: 472px;" class="station-label">
+    ec-pg1-ln1000
+  </div>
+  <div style="left: 22px; top: 370px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1116">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 41px; top: 367px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: -26px; top: 402px;" class="station-label">
+    ec-pf1-ln1000
+  </div>
+  <div style="left: 479px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1117">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 498px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 431px; top: 342px;" class="station-label">
+    ec-pe7-ln1000
+  </div>
+  <div style="left: 402px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1118">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 421px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 354px; top: 342px;" class="station-label">
+    ec-pe6-ln1000
+  </div>
+  <div style="left: 247px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1119">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 266px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 199px; top: 342px;" class="station-label">
+    ec-pe4-ln1000
+  </div>
+  <div style="left: 92px; top: 310px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1120">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 111px; top: 307px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 44px; top: 342px;" class="station-label">
+    ec-pe2-ln1000
+  </div>
+  <div style="left: 560px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1121">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 579px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 512px; top: 282px;" class="station-label">
+    ec-pd8-ln1000
+  </div>
+  <div style="left: 402px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1122">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 421px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 354px; top: 282px;" class="station-label">
+    ec-pd6-ln1000
+  </div>
+  <div style="left: 247px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1123">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 266px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 199px; top: 282px;" class="station-label">
+    ec-pd4-ln1000
+  </div>
+  <div style="left: 92px; top: 250px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1124">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 111px; top: 247px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 44px; top: 282px;" class="station-label">
+    ec-pd2-ln1000
+  </div>
+  <div style="left: 560px; top: 193px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1125">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 579px; top: 190px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 512px; top: 225px;" class="station-label">
+    ec-pc8-ln1000
+  </div>
+  <div style="left: 402px; top: 190px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1126">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 421px; top: 187px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 354px; top: 222px;" class="station-label">
+    ec-pc6-ln1000
+  </div>
+  <div style="left: 247px; top: 190px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1127">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 266px; top: 187px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 199px; top: 222px;" class="station-label">
+    ec-pc4-ln1000
+  </div>
+  <div style="left: 92px; top: 190px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1128">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 111px; top: 187px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 44px; top: 222px;" class="station-label">
+    ec-pc2-ln1000
+  </div>
+  <div style="left: 22px; top: 190px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1129">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 41px; top: 187px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: -26px; top: 222px;" class="station-label">
+    ec-pc1-ln1000
+  </div>
+  <div style="left: 560px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-Offline.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1130">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 579px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 512px; top: 162px;" class="station-label">
+    ec-pb8-ln1000
+  </div>
+  <div style="left: 402px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1131">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 421px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 354px; top: 162px;" class="station-label">
+    ec-pb6-ln1000
+  </div>
+  <div style="left: 326px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-PoweredOn.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1132">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 345px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 278px; top: 162px;" class="station-label">
+    ec-pb5-ln1000
+  </div>
+  <div style="left: 170px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1133">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 189px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: 122px; top: 162px;" class="station-label">
+    ec-pb3-ln1000
+  </div>
+  <div style="left: 22px; top: 130px; width: 32px; height: 32px; background: url(&quot;https://online.labstats.com/Images/ComputerIcons/Computer-01-InUse.png&quot;) no-repeat scroll 0px 0px / 32px 32px transparent;" class="station r0" id="sta_1134">
+  </div>
+  <img style="height: 15px; width: 15px; position: absolute; left: 41px; top: 127px;" class="os-image" src="https://online.labstats.com/Images/ComputerIcons/OsIcons/Windows.png"/>
+  <div style="font-size: 10px; left: -26px; top: 162px;" class="station-label">
+    ec-pb1-ln1000
+  </div>
+</div>

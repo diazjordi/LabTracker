@@ -1,0 +1,19 @@
+HTMLScraper properties
+
+# Provide either a single URL or a path to a text file with URLs for labs to be scraped
+# You may comment out the unneeded property
+labURL=
+labURLsFile=/home/superlib/Desktop/lab-tracker-backend/properties/labURLs.properties
+
+# Thread sleep, amount of time to allow page to load data from JS scripts
+# Example: 5000 = 5 seconds
+threadSleep=5000
+
+# Number of times to check page after initial check for data before quitting
+numberOfAttempts=2
+
+# Path to store scraped HTML locally before parsing, should be absolute when app is packaged
+# Name to store file under
+outputFilePath=/home/superlib/Desktop/lab-tracker-backend/html/scraped/
+outputFileName=scrapedHTML
+

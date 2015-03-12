@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<META HTTP-EQUIV="refresh" CONTENT="30"; URL=http://http://10.84.89.162/librarynorth1st.html">
+		<title>LabTracker</title>
+ 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	</head>
+	
+	<body>
+	
+		<div class="col-md-4">
+ 			<h1>Library North<small> 1st floor</small></h1>
+		</div>
+		<div class="container">
+			<h3 class="pull-right">Wed, Mar 11</h3>
+		</div>
+		<hr>
+		
+		<div class="container">
+			<h1>Available Stations</h1>
+			<h4>Updated Every 10 minute(s)</h4>
+			<h4>Last Updated: 2:21 PM </h4>
+				<ul style="list-style-type:none"><li style="color:green"><h1><big><strong>G7</big></strong></h1></li><li style="color:green"><h1><big><strong>G3</big></strong></h1></li><li style="color:green"><h1><big><strong>F3</big></strong></h1></li><li style="color:green"><h1><big><strong>G2</big></strong></h1></li><li style="color:green"><h1><big><strong>F2</big></strong></h1></li><li style="color:green"><h1><big><strong>E5</big></strong></h1></li><li style="color:green"><h1><big><strong>E1</big></strong></h1></li><li style="color:green"><h1><big><strong>D7</big></strong></h1></li><li style="color:green"><h1><big><strong>D3</big></strong></h1></li><li style="color:green"><h1><big><strong>C3</big></strong></h1></li><li style="color:green"><h1><big><strong>B2</big></strong></h1></li><li style="color:green"><h1><big><strong>A6</big></strong></h1></li><li style="color:green"><h1><big><strong>A3</big></strong></h1></li><li style="color:green"><h1><big><strong>A1</big></strong></h1></li><li style="color:green"><h1><big><strong>A4</big></strong></h1></li><li style="color:green"><h1><big><strong>A2</big></strong></h1></li><li style="color:green"><h1><big><strong>G8</big></strong></h1></li><li style="color:green"><h1><big><strong>G6</big></strong></h1></li><li style="color:green"><h1><big><strong>G4</big></strong></h1></li><li style="color:green"><h1><big><strong>E7</big></strong></h1></li><li style="color:green"><h1><big><strong>E4</big></strong></h1></li><li style="color:green"><h1><big><strong>E2</big></strong></h1></li><li style="color:green"><h1><big><strong>D6</big></strong></h1></li><li style="color:green"><h1><big><strong>C2</big></strong></h1></li><li style="color:green"><h1><big><strong>B6</big></strong></h1></li><li style="color:green"><h1><big><strong>B5</big></strong></h1></li></ul> 	
+		</div>
+		
+		<div class="container">
+			<h4>26 of 52 available</h4>
+		</div>
+		
+	</body>
