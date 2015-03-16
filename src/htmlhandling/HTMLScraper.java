@@ -54,8 +54,7 @@ public class HTMLScraper {
     	// Run HTMLScraper
     	run();        
     }
-    
-    
+        
 	private static void run() throws IOException, SQLException, InterruptedException{
     	System.out.println("LabTracker Is Starting!");
     	// Retrieve props
@@ -137,8 +136,7 @@ public class HTMLScraper {
 		System.out.println("Thread Sleep Is Set To: " + threadSleep	+ " millisecs");
 		System.out.println("Number Of Times To Attempt Scraping: " + numberOfAttempts);
 	}
-    
-    
+        
     // Takes URL for map page, loads map page into memory
     // searches for status div "the-pieces" and saves relevant html locally
     // for parsing

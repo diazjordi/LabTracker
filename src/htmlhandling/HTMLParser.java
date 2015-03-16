@@ -49,6 +49,9 @@ public class HTMLParser {
 	// Path to output HTML pages
 	private static String htmlListOutputPath = null;
 	private static String htmlMapOutputPath = null;
+	// DB props
+	private static String database = null;
+	private static String table = null;
 	// Vars to track units
 	private static Integer numUnits = 0;	
 	private static Integer numInUse = 0;
@@ -70,19 +73,38 @@ public class HTMLParser {
 				parseHTML();
 		// parse retrieved divs for data, create station stations and place in data structure
 			System.out.println("Creating Station Objects");
-				createStationObjects();
+				createStationObjects();				
+		// Set count variables
+		for (StudentStation station : stuStations) {
+			if (station.getStationName().matches("ec-pg9-ln1000")) {
+				station.setStationStatus("Suppressed");
+			}			
+		}
+		for (StudentStation station : stuStations) {
+			if(station.getStationStatus().matches("Available")){
+				numAvail++;
+			}
+			if(station.getStationStatus().matches("InUse")){
+				numInUse++;
+			}
+			if(station.getStationStatus().matches("Offline")){
+				numOffline++;
+			}
+			numUnits = numAvail + numInUse - numOffline;			
+		}	
 		// Write to HTML List Page
 			System.out.println("Updating HTML List With Object Data");
 				writeListOfStationsToHTML(stuStations);
 		// Write to HTML Map Page
 			System.out.println("Updating HTML Map With Object Data");
-			writeMapOfStationsToHTML(stuStations);
+				writeMapOfStationsToHTML(stuStations);
 		// Write to DB
 			System.out.println("Writing Object Data To MYSQL DB");
-				writeObjectsToTable(stuStations);
+				//writeObjectsToTable(stuStations);
 		// Write out objects to local file
 			System.out.println("Writing Objects To Local Serialized File");
-				writeObjectsToFile(stuStations);		
+				//writeObjectsToFile(stuStations);
+				System.exit(0);
 	}
 	
 	// Get properties from prop files
@@ -105,6 +127,9 @@ public class HTMLParser {
 		// Retrieve output paths for HTML
 		htmlListOutputPath = mainProps.getProperty("htmlListOutputPath");
 		htmlMapOutputPath = mainProps.getProperty("htmlMapOutputPath");
+		// Retrieve DB properties
+		database = mainProps.getProperty("database");
+		table = mainProps.getProperty("table");
 		// Eventually log all of these out
 		System.out.println("Scraper Output File Path: " + scraperOutputPath);
 		System.out.println("Parser Local Output File Path: " + parserOutputPath);
@@ -113,6 +138,8 @@ public class HTMLParser {
 		System.out.println("HTML Map Template File Path: " + htmlMapTemplateFilePath);
 		System.out.println("HTML List Output Path: " + htmlListOutputPath);
 		System.out.println("HTML Map Output Path: " + htmlMapOutputPath);
+		System.out.println("Storage Database: " + database);
+		System.out.println("Storage Table: " + table);
 	}
 	
 	/**
@@ -157,7 +184,7 @@ public class HTMLParser {
 			// station to ArrayList
 			StudentStation stu1 = new StudentStation(stationName, stationID, status);
 			stuStations.add(k, stu1);
-		}
+		}		
 	}
 
 	// Extracts station status from HTML div class="station"
@@ -165,38 +192,22 @@ public class HTMLParser {
 		// Use RegEx to extract station status from HTML
 		Pattern pat = Pattern.compile("(?<=Computer-01-)(\\w*)(?=\\.png)");
 		Matcher mat = pat.matcher(statusDiv);
-		String stationStatus;
+		String stationStatus;		
 		if (mat.find()) {
 			stationStatus = mat.group().toString();
 			if (stationStatus.matches("InUse")) {
 				stationStatus = "InUse";
-				numInUse++;
 			} else if (stationStatus.matches("PoweredOn")) {
 				stationStatus = "Available";
-				numAvail++;
-			} else {
-				numOffline++;
 			}
 		} else {
 			stationStatus = "NoStatusAvailable";
-			numOffline++;
 		}
-		numUnits = numAvail + numInUse;
 		return stationStatus;
 	}
 
 	// Writes stations to HTML file
 	private static void writeListOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
-		// Suppresses G9
-		for (StudentStation station : stuStations) {
-			if (station.getStationName().matches("ec-pg9-ln1000")) {
-				stuStations.remove(station);
-				numAvail--;
-				station.setStationStatus("Suppressed");
-				System.out.println(station.getStationNameShort() + " removed!");
-				break;
-			}
-		}
 		File htmlTemplateFile = new File(htmlListTemplateFilePath);
 		String htmlString = FileUtils.readFileToString(htmlTemplateFile);
 		StringBuilder list = new StringBuilder();
@@ -241,7 +252,16 @@ public class HTMLParser {
 					}					
 				}
 			}
-			File newHtmlFile = new File(htmlMapOutputPath);// should be a property
+			Date date = new Date();
+			DateFormat timeStamp = new SimpleDateFormat("h:mm a");
+			DateFormat dateStamp = new SimpleDateFormat("E, MMM dd");
+			String time = timeStamp.format(date).toString();
+			String date1 = dateStamp.format(date).toString();
+			htmlString = htmlString.replace("$time", time);
+			htmlString = htmlString.replace("$date", date1);
+			htmlString = htmlString.replace("$numAvail", numAvail.toString());
+			htmlString = htmlString.replace("$numUnits", numUnits.toString());
+			File newHtmlFile = new File(htmlMapOutputPath);
 			FileUtils.writeStringToFile(newHtmlFile, htmlString);
 		}
 
@@ -265,9 +285,10 @@ public class HTMLParser {
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
 			for (StudentStation station : stuStations) {
-				String query = "INSERT INTO allstationsv1 (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
+				String query = "INSERT INTO " + table + " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
 						+ " VALUES ('" + station.getStationNameShort()	+ "','"	+ station.getStationName() + "','" 
 						+ station.getStationID() + "','"	+ station.getStationStatus() + "','" + station.getStationOS() + "', NOW())";
+				//System.out.println(query);
 				stmt.executeUpdate(query);
 			}
 		} catch (SQLException ex) {

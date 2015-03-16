@@ -71,11 +71,11 @@ public class StudentStation implements Serializable {
     }
 
     public void setStationID(String stationIDIN){
-        this.stationName = stationIDIN;
+        this.stationID = stationIDIN;
     }
 
     public void setStationStatus(String stationStatusIN){
-        this.stationName = stationStatusIN;
+        this.stationStatus = stationStatusIN;
     }
 
     public void setStationOS(String osIN){
@@ -90,7 +90,7 @@ public class StudentStation implements Serializable {
     }
     @Override
     public String toString(){
-        String result = "Station Name: " + stationName + "\n" +
+        String result = " Station Name: " + stationName + "\n" +
                         " Station ID: " + stationID +  "\n" +
                         " Station Status: " + stationStatus + "\n";
         return result;
