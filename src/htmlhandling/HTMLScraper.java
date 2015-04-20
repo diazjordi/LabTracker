@@ -62,7 +62,7 @@ public class HTMLScraper {
     	System.out.println("Starting Scraping Process, Properties Set");
     	// Iterate through Lab URLs and parse
     	Iterator it = labURLs.entrySet().iterator();
-    	while(it.hasNext()){
+    	while(it.hasNext()){  
     		Map.Entry<String, String> pair =(Map.Entry<String, String>)it.next();
     		scrapeSuccess = false;
     		System.out.println("Attempting To Scrape " + pair.getValue());
@@ -111,9 +111,7 @@ public class HTMLScraper {
 			System.out.println("Program can not continue successfully, must exit!");
 			System.exit(0);
 		}
-		// Remove labURL props as they were already handled
-		mainProps.remove("labURL");
-		mainProps.remove("labURlsFile");
+		
 		// Check all properties have been provided
 		Enumeration mainPropKeys = mainProps.keys();
 		while (mainPropKeys.hasMoreElements()) { // Iterate through props
