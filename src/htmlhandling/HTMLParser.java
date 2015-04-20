@@ -34,7 +34,7 @@ import com.mysql.jdbc.Statement;
 public class HTMLParser {
 	
 	// Path to General Prop File
-	private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
+	private static String propFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties mainProps = new Properties();
 	// Path to retrieve HTML for parsing
@@ -100,11 +100,10 @@ public class HTMLParser {
 				writeMapOfStationsToHTML(stuStations);
 		// Write to DB
 			System.out.println("Writing Object Data To MYSQL DB");
-				//writeObjectsToTable(stuStations);
+				writeObjectsToTable(stuStations);
 		// Write out objects to local file
 			System.out.println("Writing Objects To Local Serialized File");
-				//writeObjectsToFile(stuStations);
-				System.exit(0);
+				writeObjectsToFile(stuStations);
 	}
 	
 	// Get properties from prop files

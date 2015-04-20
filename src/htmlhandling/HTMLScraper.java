@@ -26,7 +26,7 @@ import java.util.Properties;
 public class HTMLScraper {
    
 	// Path to General Prop File
-    private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
+    private static String propFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties generalProps = new Properties();
     // Main properties
