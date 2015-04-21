@@ -39,18 +39,19 @@ public class HTMLScraper {
     private static int numberOfAttempts;
     // Path and file name to store  scraped HTML under
     private static String scraperOutputPath = null;
+    // Path and file name to store  scraped HTML under
+    private static String errorFileOutputPath = null;
     // Holds all Lab URLs to be scraped
     private static Map<String, String> labURLs = new HashMap<String, String>();
     // Determines Whether To Attempt Parsing
     private static Boolean scrapeSuccess = false;
-    // Name Of Current Lab being Scraped & Parsed
-    protected static String currentLab = null;
     // Logger
     private static Logger log = Logger.getLogger(HTMLScraper.class);
     
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         // Configure Logger
     	BasicConfigurator.configure();
+    	
     	// Run HTMLScraper
     	run();        
     }
@@ -70,8 +71,8 @@ public class HTMLScraper {
 			if (scrapeSuccess) {
 				System.out.println("Scrape Successful, Commencing Parsing");
 				// Run HTMLParser on scraped output
-				HTMLParser parser = new HTMLParser();
-				parser.run(pair.getKey());
+				//HTMLParser parser = new HTMLParser();
+				//parser.run(pair.getKey());
 			}
     	}
     	System.out.println("LabTracker has completed process, shutting down!!");
@@ -84,6 +85,14 @@ public class HTMLScraper {
 		FileInputStream	scraperInputStream = new FileInputStream(scraperPropFile);
 		mainProps.load(scraperInputStream);
 		scraperInputStream.close();
+		// Set Error File Property
+		errorFileOutputPath = mainProps.getProperty("errorFileOutputPath");
+			File errorFile = new File(errorFileOutputPath);
+			// Check for existence of error file
+			if(errorFile.exists()){
+				System.out.println("LabTracker terminating, Error File detected! Read and resolve error to continue with next run!");
+				System.exit(0);				
+			}
 		// Test for LabURLs property
 		if (!mainProps.getProperty("labURLsFile").isEmpty()) {
 			try {
@@ -104,9 +113,11 @@ public class HTMLScraper {
 				System.out.println("Lab URLs File error!");
 				e.printStackTrace();
 			}
+		// Test Lab URL File Path is given
 		} else if (mainProps.getProperty("labURLsFile").isEmpty()) {
 			System.out.println("No Lab URL File path given!");
-		} else { // Catches no LabURLs error
+		// Catches no LabURLs error
+		} else {
 			System.out.println("No Lab URLs properties given!");
 			System.out.println("Program can not continue successfully, must exit!");
 			System.exit(0);
