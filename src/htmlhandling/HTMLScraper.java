@@ -3,12 +3,17 @@ package htmlhandling;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -47,19 +52,20 @@ public class HTMLScraper {
     private static Boolean scrapeSuccess = false;
     // Logger
     private static Logger log = Logger.getLogger(HTMLScraper.class);
+    // Error string
+    private static String error;
     
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
-        // Configure Logger
+    	// Configure Logger
     	BasicConfigurator.configure();
-    	
     	// Run HTMLScraper
-    	run();        
+    	run();
     }
         
 	private static void run() throws IOException, SQLException, InterruptedException{
     	System.out.println("LabTracker Is Starting!");
     	// Retrieve props
-    	getProps();
+    	loadProps();
     	System.out.println("Starting Scraping Process, Properties Set");
     	// Iterate through Lab URLs and parse
     	Iterator it = labURLs.entrySet().iterator();
@@ -71,26 +77,38 @@ public class HTMLScraper {
 			if (scrapeSuccess) {
 				System.out.println("Scrape Successful, Commencing Parsing");
 				// Run HTMLParser on scraped output
-				//HTMLParser parser = new HTMLParser();
-				//parser.run(pair.getKey());
+				HTMLParser parser = new HTMLParser();
+				parser.run(pair.getKey());
 			}
     	}
     	System.out.println("LabTracker has completed process, shutting down!!");
     }
     
-	private static void getProps() throws IOException {
+	private static void loadProps() throws IOException{
 		String scraperPropPath = propFilePath;
 		// Load prop file into main property object
 		File scraperPropFile = new File(scraperPropPath);
 		FileInputStream	scraperInputStream = new FileInputStream(scraperPropFile);
 		mainProps.load(scraperInputStream);
 		scraperInputStream.close();
+		// Check Property has actual values
+		if(!mainProps.isEmpty()){
+			setProps();
+		}else if (mainProps.isEmpty()){
+			error = "Fatal Error: Main Property object not set properly. Terminating LabTracker";
+			fatalError(error);
+			System.exit(0);
+		}
+	}
+	
+	private static void setProps() throws IOException {
 		// Set Error File Property
 		errorFileOutputPath = mainProps.getProperty("errorFileOutputPath");
 			File errorFile = new File(errorFileOutputPath);
 			// Check for existence of error file
 			if(errorFile.exists()){
-				System.out.println("LabTracker terminating, Error File detected! Read and resolve error to continue with next run!");
+				error = "LabTracker terminating, Error File detected! Remove file and resolve error to continue with next run!";
+				fatalError(error);
 				System.exit(0);				
 			}
 		// Test for LabURLs property
@@ -106,21 +124,17 @@ public class HTMLScraper {
 						labURLs.put(labProp, labURLProps.getProperty(labProp));
 					} else if (labURLProps.getProperty(labProp).isEmpty()) {
 						// Log error for Lab URL
-						System.out.println("URL for " + labProp+ " lab was not given!");
+						error = "URL for " + labProp+ " lab was not given!";
+						fatalError(error);
 					}
 				}
 			} catch (IOException e) {
-				System.out.println("Lab URLs File error!");
-				e.printStackTrace();
+				error = "Lab URLs File error!";
+				fatalError(error);
 			}
-		// Test Lab URL File Path is given
 		} else if (mainProps.getProperty("labURLsFile").isEmpty()) {
-			System.out.println("No Lab URL File path given!");
-		// Catches no LabURLs error
-		} else {
-			System.out.println("No Lab URLs properties given!");
-			System.out.println("Program can not continue successfully, must exit!");
-			System.exit(0);
+			error = "No Lab URL File path given!";
+			fatalError(error);
 		}
 		
 		// Check all properties have been provided
@@ -128,9 +142,8 @@ public class HTMLScraper {
 		while (mainPropKeys.hasMoreElements()) { // Iterate through props
 			String prop = mainPropKeys.nextElement().toString();
 			if (mainProps.getProperty(prop).isEmpty()) { // If prop value log error
-				System.out.println("No value given for " + prop + " property");
-				System.out.println("Program can not continue successfuly, must exit!");
-				System.exit(0);
+				error = "No value given for " + prop + " property. Program can not continue successfuly, must exit!";
+				fatalError(error);
 			}
 		}
 		// Retrieve thread sleep time
@@ -162,11 +175,12 @@ public class HTMLScraper {
 			mapPage = mapClient.getPage(url);
 		} catch (UnknownHostException a) {
 			// Log out error
-			System.out.println("Unknown Host Exception for: " + url);
+			error = "Unknown Host Exception for: " + url;
 			// Update Boolean to direct rest of process
 			pageLoaded = false;
 			// Close current web client
 			mapClient.closeAllWindows();
+			fatalError(error);
 		}
 		// If page loaded successfully, continue with scrape attempt
 		if (pageLoaded) {
@@ -191,7 +205,7 @@ public class HTMLScraper {
 						scrapeSuccess = true;
 						break;
 					} else {
-						System.out.println(url + " did not contain requested HTML, will try again " + (numberOfAttempts - i)  + " times!");
+						error = url + " did not contain requested HTML, will try again " + (numberOfAttempts - i)  + " times!";
 					}
 				}
 			}
@@ -201,4 +215,21 @@ public class HTMLScraper {
 			}
 		}
 	}
+	
+	private static void fatalError(String error) {
+		try {
+			File output = new File(errorFileOutputPath);
+			ObjectOutputStream listOutputStream = new ObjectOutputStream(new FileOutputStream(output));
+			if(error.isEmpty()){
+				listOutputStream.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
+			}else{
+				listOutputStream.writeUTF(error);
+			}			
+			listOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.exit(0);
+	}
+	
 }
