@@ -31,7 +31,7 @@ import java.util.Properties;
 public class HTMLScraper {
    
 	// Path to General Prop File
-    private static String propFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North-1st/properties/LabTrackerProps.properties";
+    private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties generalProps = new Properties();
     // Main properties
@@ -66,7 +66,7 @@ public class HTMLScraper {
     	System.out.println("LabTracker Is Starting!");
     	// Retrieve props
     	loadProps();
-    	System.out.println("Starting Scraping Process, Properties Set");
+    	System.out.println("Properties Set, Starting Scraping Process!");
     	// Iterate through Lab URLs and parse
     	Iterator it = labURLs.entrySet().iterator();
     	while(it.hasNext()){  
@@ -101,15 +101,15 @@ public class HTMLScraper {
 		}
 	}
 	
-	private static void setProps() throws IOException {
+	private static void setProps() throws IOException {		
 		// Set Error File Property
 		errorFileOutputPath = mainProps.getProperty("errorFileOutputPath");
 			File errorFile = new File(errorFileOutputPath);
 			// Check for existence of error file
 			if(errorFile.exists()){
 				error = "LabTracker terminating, Error File detected! Remove file and resolve error to continue with next run!";
-				fatalError(error);
-				System.exit(0);				
+				System.out.println(error);
+				fatalError(error);		
 			}
 		// Test for LabURLs property
 		if (!mainProps.getProperty("labURLsFile").isEmpty()) {
@@ -152,6 +152,8 @@ public class HTMLScraper {
 		numberOfAttempts = Integer.parseInt(mainProps.getProperty("numberOfAttempts"));
 		// Retrieve local file path
 		scraperOutputPath = mainProps.getProperty("scraperOutputPath");
+		// Set mapHTMLTemplate - temporary
+		//htmlMapOutputPath = mainProps.getProperty("htmlMapOutputPath");
 		// Eventually log all of these out
 		System.out.println("Number Of Lab URLs provided: " + labURLs.size());
 		System.out.println(labURLs);
@@ -182,6 +184,7 @@ public class HTMLScraper {
 			mapClient.closeAllWindows();
 			fatalError(error);
 		}
+		int currentAttempt = 1;
 		// If page loaded successfully, continue with scrape attempt
 		if (pageLoaded) {
 			// Checks whether div has been found 
@@ -204,14 +207,15 @@ public class HTMLScraper {
 						System.out.println(url + " contained requested HTML, successfully scraped and written to local file!");
 						scrapeSuccess = true;
 						break;
-					} else {
+					} else if (mapPage.getElementById("the-pieces") == null) {
 						error = url + " did not contain requested HTML, will try again " + (numberOfAttempts - i)  + " times!";
 					}
 				}
 			}
 			// If no data was found update Boolean and log error
 			if(!divLoaded){
-				System.out.println(url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!");
+				error = url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!";
+				fatalError(error);
 			}
 		}
 	}
@@ -223,6 +227,7 @@ public class HTMLScraper {
 			if(error.isEmpty()){
 				listOutputStream.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
 			}else{
+				System.out.println(error);
 				listOutputStream.writeUTF(error);
 			}			
 			listOutputStream.close();

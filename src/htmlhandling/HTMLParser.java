@@ -34,7 +34,7 @@ import com.mysql.jdbc.Statement;
 public class HTMLParser {
 	
 	// Path to General Prop File
-	private static String propFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North-1st/properties/LabTrackerProps.properties";
+	private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties mainProps = new Properties();
 	// Path to retrieve HTML for parsing
@@ -92,9 +92,6 @@ public class HTMLParser {
 			}
 			numUnits = numAvail + numInUse - numOffline;			
 		}	
-		// Write to HTML List Page
-			System.out.println("Updating HTML List With Object Data");
-				writeListOfStationsToHTML(stuStations);
 		// Write to HTML Map Page
 			System.out.println("Updating HTML Map With Object Data");
 				writeMapOfStationsToHTML(stuStations);
@@ -204,43 +201,16 @@ public class HTMLParser {
 		}
 		return stationStatus;
 	}
-
-	// Writes stations to HTML file
-	private static void writeListOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
-		File htmlTemplateFile = new File(htmlListTemplateFilePath);
-		String htmlString = FileUtils.readFileToString(htmlTemplateFile);
-		StringBuilder list = new StringBuilder();
-		
-		// Append table header
-		list.append("<ul style=\"list-style-type:none\">");
-		Date date = new Date();
-		DateFormat timeStamp = new SimpleDateFormat("h:mm a");
-		DateFormat dateStamp = new SimpleDateFormat("E, MMM dd");
-		String time = timeStamp.format(date).toString();
-		String date1 = dateStamp.format(date).toString();
-		for (StudentStation station : stuStations) {
-			if (station.getStationStatus().matches("Available")) {
-				list.append("<li style=\"color:green\"><h1><big><strong>"
-						+ station.getStationNameShort().toUpperCase()
-						+ "</big></strong></h1></li>");
-			}
-		}
-		list.append("</ul>");
-		htmlString = htmlString.replace("$date", date1);
-		htmlString = htmlString.replace("$list", list);
-		htmlString = htmlString.replace("$time", time);
-		htmlString = htmlString.replace("$numAvail", numAvail.toString());
-		htmlString = htmlString.replace("$numUnits", numUnits.toString());
-		File newHtmlFile = new File(htmlListOutputPath);
-		FileUtils.writeStringToFile(newHtmlFile, htmlString);
-	}
 	
-		// Writes stations to HTML Map File
+	// Writes stations to HTML Map File
 	private static void writeMapOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
 			File htmlMapTemplateFile = new File(htmlMapTemplateFilePath);
 			String htmlString = FileUtils.readFileToString(htmlMapTemplateFile);
-			// Available Color String
+			// Color Strings
 			String availColor = "<FONT COLOR=\"#ffcb2f\">";
+			String noStatusColor = "<FONT COLOR=\"#595138\">";
+			String inUseColor = "<FONT COLOR=\"#665113\">";
+			// HTML Match Strings
 			String begMatch = "<!--$";
 			String endMatch ="-->";
 			for (StudentStation station : stuStations) {				
@@ -248,7 +218,19 @@ public class HTMLParser {
 					String completeMatch = begMatch + station.getStationNameShort() + endMatch;
 					if(htmlString.contains(completeMatch)){
 						htmlString = htmlString.replace(completeMatch, availColor);
-					}					
+					}
+				}// Not currently displaying anything for In Use stations, leave blank
+				else if (station.getStationStatus().matches("InUse")) {
+					String completeMatch = begMatch + station.getStationNameShort() + endMatch;
+//					if(htmlString.contains(completeMatch)){
+//						htmlString = htmlString.replace(completeMatch, inUseColor);
+//					}					
+				}
+				else {
+					String completeMatch = begMatch + station.getStationNameShort() + endMatch;
+					if(htmlString.contains(completeMatch)){
+						htmlString = htmlString.replace(completeMatch, noStatusColor);
+					}
 				}
 			}
 			Date date = new Date();
