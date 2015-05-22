@@ -31,7 +31,7 @@ import java.util.Properties;
 public class HTMLScraper {
    
 	// Path to General Prop File
-    private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
+    private static String propFilePath = "/home/superlib/Desktop/LabTracker-Testing-2/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties generalProps = new Properties();
     // Main properties
@@ -112,9 +112,9 @@ public class HTMLScraper {
 				fatalError(error);		
 			}
 		// Test for LabURLs property
-		if (!mainProps.getProperty("labURLsFile").isEmpty()) {
+		if (!mainProps.getProperty("scraperLabURLsFile").isEmpty()) {
 			try {
-				File labUrlFile = new File(mainProps.getProperty("labURLsFile"));
+				File labUrlFile = new File(mainProps.getProperty("scraperLabURLsFile"));
 				FileInputStream labFileInput = new FileInputStream(labUrlFile);
 				labURLProps.load(labFileInput);
 				Enumeration labURLKeys = labURLProps.keys();
@@ -147,9 +147,9 @@ public class HTMLScraper {
 			}
 		}
 		// Retrieve thread sleep time
-		threadSleep = Integer.parseInt(mainProps.getProperty("threadSleep"));
+		threadSleep = Integer.parseInt(mainProps.getProperty("scraperThreadSleep"));
 		// Retrieve number of tries
-		numberOfAttempts = Integer.parseInt(mainProps.getProperty("numberOfAttempts"));
+		numberOfAttempts = Integer.parseInt(mainProps.getProperty("scraperNumberOfAttempts"));
 		// Retrieve local file path
 		scraperOutputPath = mainProps.getProperty("scraperOutputPath");
 		// Set mapHTMLTemplate - temporary

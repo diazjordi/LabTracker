@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,7 +35,7 @@ import com.mysql.jdbc.Statement;
 public class HTMLParser {
 	
 	// Path to General Prop File
-	private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
+	private static String propFilePath = "/home/superlib/Desktop/LabTracker-Testing-2/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties mainProps = new Properties();
 	// Path to retrieve HTML for parsing
@@ -56,6 +57,7 @@ public class HTMLParser {
 	private static Integer numUnits = 0;	
 	private static Integer numInUse = 0;
 	private static Integer numAvail = 0;
+	private static Integer numNoStatus = 0;
 	private static Integer numOffline = 0;
 	// Vars to hold HTML divs
 	private static Elements stationNameDivs;
@@ -63,6 +65,10 @@ public class HTMLParser {
 	private static Elements osImageDivs; //currently unused
 	// ArrayList to hold parsed and created stations
 	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
+	// Temp strings
+	private static String avail;
+	private static String inUse;
+	private static String off;
 
 	public void run(String currentLab) throws IOException, SQLException {
 		// Retrieve Properties
@@ -90,8 +96,35 @@ public class HTMLParser {
 			if(station.getStationStatus().matches("Offline")){
 				numOffline++;
 			}
-			numUnits = numAvail + numInUse - numOffline;			
-		}	
+			numUnits = numAvail + numInUse + numOffline;						
+		}		
+		
+		System.out.println("Total Number of Units: " + numUnits);
+		System.out.println("Number of Available: " + numAvail);
+		System.out.println("Number of In Use: " + numInUse);
+		System.out.println("Number of No Status: " + numOffline);
+		
+		float numUnits1 = numUnits;
+		float numAvail1 = numAvail;
+		float numInUse1 = numInUse;
+		float numOffline1 = numOffline;
+		
+		float percentAvail =  (numAvail1/numUnits1) * 100;
+		float percentInUse =  (numInUse1/numUnits1) * 100;
+		float percentOffline =  (numOffline1/numUnits1) * 100;
+		
+		int percAvail = (int) percentAvail;
+		int percInUse = (int) percentInUse;
+		int percOffline = (int) percentOffline;
+		
+		avail = "(Available - " + numAvail   + ", " + numUnits + ", " + percAvail   + "%)";
+		inUse = "(In Use    - " + numInUse   + ", " + numUnits + ", " + percInUse   + "%)";
+		off   = "(Offline   - " + numOffline + ", " + numUnits + ", " + percOffline + "%)";
+		
+		System.out.println(avail);
+		System.out.println(inUse);
+		System.out.println(off);
+		
 		// Write to HTML Map Page
 			System.out.println("Updating HTML Map With Object Data");
 				writeMapOfStationsToHTML(stuStations);
@@ -242,6 +275,10 @@ public class HTMLParser {
 			htmlString = htmlString.replace("$date", date1);
 			htmlString = htmlString.replace("$numAvail", numAvail.toString());
 			htmlString = htmlString.replace("$numUnits", numUnits.toString());
+			
+			htmlString = htmlString.replace("$availSummary", avail);
+			htmlString = htmlString.replace("$inUseSummary", inUse);
+			htmlString = htmlString.replace("$offSummary", off);
 			File newHtmlFile = new File(htmlMapOutputPath);
 			FileUtils.writeStringToFile(newHtmlFile, htmlString);
 		}
@@ -272,6 +309,11 @@ public class HTMLParser {
 				//System.out.println(query);
 				stmt.executeUpdate(query);
 			}
+			String logQuery = "INSERT INTO " + table + " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
+					+ " VALUES ('" + avail	+ "','"	+ inUse + "','" 
+					+ off + "','RunStatus','" + null + "', NOW())";
+			System.out.println(logQuery);
+			stmt.executeUpdate(logQuery);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
