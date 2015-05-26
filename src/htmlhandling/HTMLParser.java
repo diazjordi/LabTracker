@@ -35,7 +35,7 @@ import com.mysql.jdbc.Statement;
 public class HTMLParser {
 	
 	// Path to General Prop File
-	private static String propFilePath = "/home/superlib/Desktop/LabTracker-Testing-2/Library-North-1st/properties/LabTrackerProps.properties";
+	private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
     // Main properties
     private static Properties mainProps = new Properties();
 	// Path to retrieve HTML for parsing

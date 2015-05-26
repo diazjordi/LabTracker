@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Jordi Diaz on 12/22/14.
  */
+
 public class StudentStation implements Serializable {
 
     private static final long serialVersionUID = 7526472295622776147L;
