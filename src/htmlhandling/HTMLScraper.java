@@ -8,6 +8,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
+import setup.PropertyManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,54 +23,51 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Designed to open browser, navigate to
  * status web page, find HTML code for current status of PC's then fetch that
  * specific HTML div and save it locally for parsing by separate class
  */
+
 @SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class HTMLScraper {
 
-	// Path to General Prop File
-	private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
-	// Main properties
-	private static Properties generalProps = new Properties();
-	// Main properties
-	private static Properties mainProps = new Properties();
-	// Lab URL properties
-	private static Properties labURLProps = new Properties();
+	// Scraper properties
+	private Map<String, String> scraperProperties = new HashMap<String, String>();
+	// URLs to scrape
+	private Map<String, String> labURLs = new HashMap<String, String>();
 	// Amount of time to sleep while page loads
-	private static int threadSleep;
+	private int threadSleep;
 	// Number of times to try and scrape page
-	private static int numberOfAttempts;
+	private int numberOfAttempts;
 	// Path and file name to store scraped HTML under
-	private static String scraperOutputPath = null;
-	// Path and file name to store scraped HTML under
-	private static String errorFileOutputPath = null;
-	// Holds all Lab URLs to be scraped
-	private static Map<String, String> labURLs = new HashMap<String, String>();
+	private String scraperOutputPath = null;
 	// Determines Whether To Attempt Parsing
-	private static Boolean scrapeSuccess = false;
-	// Logger
-	private static Logger log = Logger.getLogger(HTMLScraper.class);
-	// Error string
-	private static String error;
+	private Boolean scrapeSuccess = false;
+	// Error Handling
+	private String errorFileOutputPath;
+	private String error;
 
-	public static void main(String[] args) throws IOException, SQLException,
-			InterruptedException {
-		// Configure Logger
-		BasicConfigurator.configure();
-		// Run HTMLScraper
-		run();
-	}
-
-	private static void run() throws IOException, SQLException,
-			InterruptedException {
-		System.out.println("LabTracker Is Starting!");
-		// Retrieve props
-		loadProps();
+	public void run() throws IOException, SQLException, InterruptedException {
+		System.out.println("*-----HTMLScraper Is Starting!-----*");
+		PropertyManager propManager = new PropertyManager();
+		// Get props
+		this.scraperProperties = propManager.getScraperProperties();
+		errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");
+		// Set props
+		this.labURLs = propManager.getLabURLs();
+		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
+		this.numberOfAttempts = Integer.parseInt(scraperProperties.get("scraperNumberOfAttempts"));
+		this.scraperOutputPath = scraperProperties.get("scraperOutputPath");
 		System.out.println("Properties Set, Starting Scraping Process!");
+		// Run Parent Method to Control scraping
+		iterateURLsAndScrape();
+		
+	}
+	
+	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {
 		// Iterate through Lab URLs and parse
 		Iterator it = labURLs.entrySet().iterator();
 		while (it.hasNext()) {
@@ -87,100 +86,14 @@ public class HTMLScraper {
 		System.out.println("LabTracker has completed process, shutting down!!");
 	}
 
-	private static void loadProps() throws IOException {
-		String scraperPropPath = propFilePath;
-		// Load prop file into main property object
-		File scraperPropFile = new File(scraperPropPath);
-		FileInputStream scraperInputStream = new FileInputStream(
-				scraperPropFile);
-		mainProps.load(scraperInputStream);
-		scraperInputStream.close();
-		// Check Property has actual values
-		if (!mainProps.isEmpty()) {
-			setProps();
-		} else if (mainProps.isEmpty()) {
-			error = "Fatal Error: Main Property object not set properly. Terminating LabTracker";
-			fatalError(error);
-			System.exit(0);
-		}
-	}
-
-	private static void setProps() throws IOException {
-		// Set Error File Property
-		errorFileOutputPath = mainProps.getProperty("errorFileOutputPath");
-		File errorFile = new File(errorFileOutputPath);
-		// Check for existence of error file
-		if (errorFile.exists()) {
-			error = "LabTracker terminating, Error File detected! Remove file and resolve error to continue with next run!";
-			System.out.println(error);
-			fatalError(error);
-		}
-		// Test for LabURLs property
-		if (!mainProps.getProperty("scraperLabURLsFile").isEmpty()) {
-			try {
-				File labUrlFile = new File(
-						mainProps.getProperty("scraperLabURLsFile"));
-				FileInputStream labFileInput = new FileInputStream(labUrlFile);
-				labURLProps.load(labFileInput);
-				Enumeration labURLKeys = labURLProps.keys();
-				while (labURLKeys.hasMoreElements()) { // Iterate through props
-					String labProp = labURLKeys.nextElement().toString();
-					if (!labURLProps.getProperty(labProp).isEmpty()) {
-						labURLs.put(labProp, labURLProps.getProperty(labProp));
-					} else if (labURLProps.getProperty(labProp).isEmpty()) {
-						// Log error for Lab URL
-						error = "URL for " + labProp + " lab was not given!";
-						fatalError(error);
-					}
-				}
-			} catch (IOException e) {
-				error = "Lab URLs File error!";
-				fatalError(error);
-			}
-		} else if (mainProps.getProperty("labURLsFile").isEmpty()) {
-			error = "No Lab URL File path given!";
-			fatalError(error);
-		}
-
-		// Check all properties have been provided
-		Enumeration mainPropKeys = mainProps.keys();
-		while (mainPropKeys.hasMoreElements()) { // Iterate through props
-			String prop = mainPropKeys.nextElement().toString();
-			if (mainProps.getProperty(prop).isEmpty()) { // If prop value log
-															// error
-				error = "No value given for "
-						+ prop
-						+ " property. Program can not continue successfuly, must exit!";
-				fatalError(error);
-			}
-		}
-		// Retrieve thread sleep time
-		threadSleep = Integer.parseInt(mainProps
-				.getProperty("scraperThreadSleep"));
-		// Retrieve number of tries
-		numberOfAttempts = Integer.parseInt(mainProps
-				.getProperty("scraperNumberOfAttempts"));
-		// Retrieve local file path
-		scraperOutputPath = mainProps.getProperty("scraperOutputPath");
-		// Set mapHTMLTemplate - temporary
-		// htmlMapOutputPath = mainProps.getProperty("htmlMapOutputPath");
-		// Eventually log all of these out
-		System.out.println("Number Of Lab URLs provided: " + labURLs.size());
-		System.out.println(labURLs);
-		System.out.println("Thread Sleep Is Set To: " + threadSleep
-				+ " millisecs");
-		System.out.println("Number Of Times To Attempt Scraping: "
-				+ numberOfAttempts);
-	}
-
 	// Takes URL for map page, loads map page into memory
 	// searches for status div "the-pieces" and saves relevant html locally
 	// for parsing
-	private static void getHtmlFromPage(String url) throws IOException,
+	private void getHtmlFromPage(String url) throws IOException,
 			InterruptedException {
 		// To keep track of whether loads are successful
-		Boolean pageLoaded = true;
-		Boolean divLoaded = false;
+		boolean pageLoaded = true;
+		boolean divLoaded = false;
 		// Gets Page, will currently only load script output for Firefox 24
 		// will throw warnings and alerts, should be sorted.
 		WebClient mapClient = new WebClient(BrowserVersion.FIREFOX_24);
@@ -240,7 +153,7 @@ public class HTMLScraper {
 		}
 	}
 
-	private static void fatalError(String error) {
+	private void fatalError(String error) {
 		try {
 			File output = new File(errorFileOutputPath);
 			ObjectOutputStream listOutputStream = new ObjectOutputStream(

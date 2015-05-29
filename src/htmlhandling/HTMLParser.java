@@ -13,6 +13,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +24,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import setup.PropertyManager;
 import stations.StudentStation;
 
 import com.mysql.jdbc.Statement;
@@ -34,44 +37,59 @@ import com.mysql.jdbc.Statement;
 @SuppressWarnings("unused")
 public class HTMLParser {
 	
-	// Path to General Prop File
-	private static String propFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
-    // Main properties
-    private static Properties mainProps = new Properties();
+	// Parser properties
+    private Map<String, String> parserProperties = new HashMap<String, String>();
+    // HTML Templates & Properties
+    private Map<String, String> htmlProperties = new HashMap<String, String>();
+    // Error File property
+    private Map<String, String> errorProperties = new HashMap<String, String>();
+    // Database properties
+    private Map<String, String> databaseProperties = new HashMap<String, String>();
+    
 	// Path to retrieve HTML for parsing
-	private static String scraperOutputPath = null;
-	// Path and file name to store parsed HTML under
-	private static String parserOutputPath = null;
-	// Path to suppression file
-	private static String suppressionFilePath = null;
+	private String parserInputPath = null;
+	private String parserOutputPath = null;
+	private String parserSuppressionFilePath = null;
+	
 	// Paths to HTML template pages
-	private static String htmlListTemplateFilePath = null;
-	private static String htmlMapTemplateFilePath = null;
-	// Path to output HTML pages
-	private static String htmlListOutputPath = null;
-	private static String htmlMapOutputPath = null;
+	private String htmlListTemplateFilePath = null;
+	private String htmlMapTemplateFilePath = null;
+	// Paths to output HTML pages
+	private String htmlListOutputPath = null;
+	private String htmlMapOutputPath = null;
+	
 	// DB props
-	private static String database = null;
-	private static String table = null;
+	private String database = null;
+	private String table = null;
+	
 	// Vars to track units
-	private static Integer numUnits = 0;	
-	private static Integer numInUse = 0;
-	private static Integer numAvail = 0;
-	private static Integer numNoStatus = 0;
-	private static Integer numOffline = 0;
+	private Integer numUnits = 0;	
+	private Integer numInUse = 0;
+	private Integer numAvail = 0;
+	private Integer numNoStatus = 0;
+	private Integer numOffline = 0;
+	
 	// Vars to hold HTML divs
-	private static Elements stationNameDivs;
-	private static Elements statusDivs;	
-	private static Elements osImageDivs; //currently unused
+	private Elements stationNameDivs;
+	private Elements statusDivs;	
+	private Elements osImageDivs; //currently unused
+	
 	// ArrayList to hold parsed and created stations
-	private static ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
-	// Temp strings
-	private static String avail;
-	private static String inUse;
-	private static String off;
-
+	private ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
+	
+	// Count variables
+	private String avail;
+	private String inUse;
+	private String off;
+	
+	// Error Handling
+	private String errorFileOutputPath;
+	private String error;
+    
+    
 	public void run(String currentLab) throws IOException, SQLException {
-		// Retrieve Properties
+		System.out.println("*-----HTMLParser Is Starting!-----*");
+		// Set props
 			System.out.println("Retrieving Parser Properties");
 				getProps();
 		// parse HTML for needed fields/divs
@@ -79,52 +97,7 @@ public class HTMLParser {
 				parseHTML();
 		// parse retrieved divs for data, create station stations and place in data structure
 			System.out.println("Creating Station Objects");
-				createStationObjects();				
-		// Set count variables
-		for (StudentStation station : stuStations) {
-			if (station.getStationName().matches("ec-pg9-ln1000")) {
-				station.setStationStatus("Suppressed");
-			}			
-		}
-		for (StudentStation station : stuStations) {
-			if(station.getStationStatus().matches("Available")){
-				numAvail++;
-			}
-			if(station.getStationStatus().matches("InUse")){
-				numInUse++;
-			}
-			if(station.getStationStatus().matches("Offline")){
-				numOffline++;
-			}
-			numUnits = numAvail + numInUse + numOffline;						
-		}		
-		
-		System.out.println("Total Number of Units: " + numUnits);
-		System.out.println("Number of Available: " + numAvail);
-		System.out.println("Number of In Use: " + numInUse);
-		System.out.println("Number of No Status: " + numOffline);
-		
-		float numUnits1 = numUnits;
-		float numAvail1 = numAvail;
-		float numInUse1 = numInUse;
-		float numOffline1 = numOffline;
-		
-		float percentAvail =  (numAvail1/numUnits1) * 100;
-		float percentInUse =  (numInUse1/numUnits1) * 100;
-		float percentOffline =  (numOffline1/numUnits1) * 100;
-		
-		int percAvail = (int) percentAvail;
-		int percInUse = (int) percentInUse;
-		int percOffline = (int) percentOffline;
-		
-		avail = "(Available - " + numAvail   + ", " + numUnits + ", " + percAvail   + "%)";
-		inUse = "(In Use    - " + numInUse   + ", " + numUnits + ", " + percInUse   + "%)";
-		off   = "(Offline   - " + numOffline + ", " + numUnits + ", " + percOffline + "%)";
-		
-		System.out.println(avail);
-		System.out.println(inUse);
-		System.out.println(off);
-		
+				createStationObjects();		
 		// Write to HTML Map Page
 			System.out.println("Updating HTML Map With Object Data");
 				writeMapOfStationsToHTML(stuStations);
@@ -137,51 +110,92 @@ public class HTMLParser {
 	}
 	
 	// Get properties from prop files
-	private static void getProps() throws IOException {
-		String scraperPropPath = propFilePath;
-		// Load prop file into main property object
-		File parserPropFile = new File(scraperPropPath);
-		FileInputStream parserInputStream = new FileInputStream(parserPropFile);
-		mainProps.load(parserInputStream);
-		parserInputStream.close();
-		// Retrieve thread sleep time
-		scraperOutputPath = mainProps.getProperty("scraperOutputPath");
-		// Retrieve local output file path
-		parserOutputPath = mainProps.getProperty("parserOutputPath");
-		// Retrieve local suppression file path
-		suppressionFilePath = mainProps.getProperty("suppressionFilePath");
-		// Retrieve local template paths
-		htmlListTemplateFilePath = mainProps.getProperty("htmlListTemplateFilePath");
-		htmlMapTemplateFilePath = mainProps.getProperty("htmlMapTemplateFilePath");
-		// Retrieve output paths for HTML
-		htmlListOutputPath = mainProps.getProperty("htmlListOutputPath");
-		htmlMapOutputPath = mainProps.getProperty("htmlMapOutputPath");
-		// Retrieve DB properties
-		database = mainProps.getProperty("database");
-		table = mainProps.getProperty("table");
-		// Eventually log all of these out
-		System.out.println("Scraper Output File Path: " + scraperOutputPath);
-		System.out.println("Parser Local Output File Path: " + parserOutputPath);
-		System.out.println("Supression File Path: " + suppressionFilePath);
-		System.out.println("HTML List Template File Path: " + htmlListTemplateFilePath);	
-		System.out.println("HTML Map Template File Path: " + htmlMapTemplateFilePath);
-		System.out.println("HTML List Output Path: " + htmlListOutputPath);
-		System.out.println("HTML Map Output Path: " + htmlMapOutputPath);
-		System.out.println("Storage Database: " + database);
-		System.out.println("Storage Table: " + table);
+		private void getProps() throws IOException {
+			PropertyManager propManager = new PropertyManager();
+			// Get props
+			this.parserProperties = propManager.getParserProperties();
+			this.htmlProperties = propManager.getParserProperties();
+			this.databaseProperties = propManager.getParserProperties();
+			// Set props
+			this.parserInputPath           = parserProperties.get("parserInputPath");
+			this.parserOutputPath          = parserProperties.get("parserOutputPath");
+			this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
+			// Retrieve local template paths
+			this.htmlListTemplateFilePath  = htmlProperties.get("htmlListTemplateFilePath");
+			this.htmlMapTemplateFilePath   = htmlProperties.get("htmlMapTemplateFilePath");
+			this.htmlListOutputPath        = htmlProperties.get("htmlListOutputPath");
+			this.htmlMapOutputPath         = htmlProperties.get("htmlMapOutputPath");
+			// Retrieve Error path
+			this.errorFileOutputPath       = errorProperties.get("errorFileOutputPath");
+			// Retrieve DB properties
+			this.database                  = databaseProperties.get("db");
+			this.table                     = databaseProperties.get("db.table");
+			// Eventually log all of these out
+			System.out.println("Parser Input File Path: " + parserInputPath);
+			System.out.println("Parser Local Output File Path: " + parserOutputPath);
+			System.out.println("Supression File Path: " + parserSuppressionFilePath);
+			System.out.println("HTML List Template File Path: " + htmlListTemplateFilePath);	
+			System.out.println("HTML Map Template File Path: " + htmlMapTemplateFilePath);
+			System.out.println("HTML List Output Path: " + htmlListOutputPath);
+			System.out.println("HTML Map Output Path: " + htmlMapOutputPath);
+			System.out.println("Storage Database: " + database);
+			System.out.println("Storage Table: " + table);
+		}
+	
+	
+	
+	private void setCountVariables() {
+		// Set count variables
+		for (StudentStation station : stuStations) {
+			if (station.getStationName().matches("ec-pg9-ln1000")) {
+				station.setStationStatus("Suppressed");
+			}
+		}
+		for (StudentStation station : stuStations) {
+			if (station.getStationStatus().matches("Available")) {
+				numAvail++;
+			}else if (station.getStationStatus().matches("InUse")) {
+				numInUse++;
+			}else if (station.getStationStatus().matches("Offline")) {
+				numOffline++;
+			}
+		}
+		numUnits = numAvail + numInUse + numOffline;
+		System.out.println("Total Number of Units: " + numUnits);
+		System.out.println("Number of Available: " + numAvail);
+		System.out.println("Number of In Use: " + numInUse);
+		System.out.println("Number of No Status: " + numOffline);
+		float numUnits1 = numUnits;
+		float numAvail1 = numAvail;
+		float numInUse1 = numInUse;
+		float numOffline1 = numOffline;
+		float percentAvail = (numAvail1 / numUnits1) * 100;
+		float percentInUse = (numInUse1 / numUnits1) * 100;
+		float percentOffline = (numOffline1 / numUnits1) * 100;
+		int percAvail = (int) percentAvail;
+		int percInUse = (int) percentInUse;
+		int percOffline = (int) percentOffline;
+		avail = "(Available - " + numAvail + ", " + numUnits + ", " + percAvail	+ "%)";
+		inUse = "(In Use    - " + numInUse + ", " + numUnits + ", " + percInUse	+ "%)";
+		off = "(Offline   - " + numOffline + ", " + numUnits + ", "	+ percOffline + "%)";
+		System.out.println(avail);
+		System.out.println(inUse);
+		System.out.println(off);
 	}
+	
+	
 	
 	/**
 	 * Methods to extract needed fields from HTML These methods are not really
 	 * needed, but structure of HTML may change in the future. May be beneficial
 	 * to make code as modular as possible to avoid coding confusion later
 	 */
-	private static void parseHTML() throws IOException {
+	private void parseHTML() throws IOException {
 		try {
 			/** Load HTML pulled from page into File then load file into Document
 			 * for parsing
 			 */
-			File input = new File(scraperOutputPath);
+			File input = new File(parserInputPath);
 			Document doc = Jsoup.parse(input, "UTF-8", "");
 			// Create elements out of relevant HTML divs
 			stationNameDivs = doc.getElementsByClass("station-label");
@@ -200,7 +214,7 @@ public class HTMLParser {
 	 * them into stations and/or store all retrieved data in some sort of
 	 * persistent/saved data structure
 	 */
-	private static void createStationObjects() {
+	private void createStationObjects() {
 		// Iterates through divs containing station ID info
 		for (int k = 0; k < stationNameDivs.size(); k++) {
 			// Retrieves each station name from station name divs
@@ -217,7 +231,7 @@ public class HTMLParser {
 	}
 
 	// Extracts station status from HTML div class="station"
-	private static String getStationStatus(String statusDiv) {
+	private String getStationStatus(String statusDiv) {
 		// Use RegEx to extract station status from HTML
 		Pattern pat = Pattern.compile("(?<=Computer-01-)(\\w*)(?=\\.png)");
 		Matcher mat = pat.matcher(statusDiv);
@@ -236,7 +250,7 @@ public class HTMLParser {
 	}
 	
 	// Writes stations to HTML Map File
-	private static void writeMapOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
+	private void writeMapOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
 			File htmlMapTemplateFile = new File(htmlMapTemplateFilePath);
 			String htmlString = FileUtils.readFileToString(htmlMapTemplateFile);
 			// Color Strings
@@ -286,7 +300,7 @@ public class HTMLParser {
 	// Writes station objects data to MySQL DB
 	// table: allstationsv1
 	// fields: StationName, StationID, StationStatus, OS, DATE
-	private static void writeObjectsToTable(ArrayList<StudentStation> stuStations) throws IOException,
+	private void writeObjectsToTable(ArrayList<StudentStation> stuStations) throws IOException,
 			SQLException {
 		// Iterate through ArrayList of student stations and write out to table
 		// for use by Node.js or Apache front end
@@ -321,7 +335,7 @@ public class HTMLParser {
 	}
 
 	// Writes station objects to serialized file
-	private static void writeObjectsToFile(ArrayList<StudentStation> stuStations) throws IOException {
+	private void writeObjectsToFile(ArrayList<StudentStation> stuStations) throws IOException {
 		// Iterate through ArrayList of student stations and write out to file
 		try {
 			File output = new File(parserOutputPath);
