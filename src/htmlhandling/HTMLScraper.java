@@ -55,7 +55,7 @@ public class HTMLScraper {
 		PropertyManager propManager = new PropertyManager();
 		// Get props
 		this.scraperProperties = propManager.getScraperProperties();
-		errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");
+		this.errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");
 		// Set props
 		this.labURLs = propManager.getLabURLs();
 		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
@@ -109,13 +109,12 @@ public class HTMLScraper {
 			mapClient.closeAllWindows();
 			fatalError(error);
 		}
-		int currentAttempt = 1;
 		// If page loaded successfully, continue with scrape attempt
 		if (pageLoaded) {
 			// Checks whether div has been found
 			if (!divLoaded) {
 				// Loop to keep track of number of attempts to retrieve HTML
-				for (int i = 1; i <= numberOfAttempts; i++) {
+				for (int i = 0; i <= numberOfAttempts; i++) {
 					// Sleep for amount of time set in props, for JS on page to
 					// execute
 					Thread.sleep(threadSleep);
@@ -124,29 +123,23 @@ public class HTMLScraper {
 						// Create file to save HTML
 						File scrapedHTML = new File(scraperOutputPath);
 						// Create string from requested html div
-						String htmlString = mapPage
-								.getElementById("the-pieces").asXml();
+						String htmlString = mapPage.getElementById("the-pieces").asXml();
 						// Write to file
 						FileUtils.writeStringToFile(scrapedHTML, htmlString);
 						// Update Boolean
 						divLoaded = true;
 						// Log out successful scrape
-						System.out
-								.println(url
-										+ " contained requested HTML, successfully scraped and written to local file!");
+						System.out.println(url + " contained requested HTML, successfully scraped and written to local file!");
 						scrapeSuccess = true;
 						break;
 					} else if (mapPage.getElementById("the-pieces") == null) {
-						error = url
-								+ " did not contain requested HTML, will try again "
-								+ (numberOfAttempts - i) + " times!";
+						error = url	+ " did not contain requested HTML, will try again " + (numberOfAttempts - i) + " times!";
 					}
 				}
 			}
 			// If no data was found update Boolean and log error
 			if (!divLoaded) {
-				error = url + " did not contain requested HTML, made "
-						+ numberOfAttempts + " attempts to retrieve!";
+				error = url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!";
 				fatalError(error);
 			}
 		}
@@ -158,8 +151,7 @@ public class HTMLScraper {
 			ObjectOutputStream listOutputStream = new ObjectOutputStream(
 					new FileOutputStream(output));
 			if (error.isEmpty()) {
-				listOutputStream
-						.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
+				listOutputStream.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
 			} else {
 				System.out.println(error);
 				listOutputStream.writeUTF(error);

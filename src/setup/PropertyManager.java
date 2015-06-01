@@ -120,7 +120,7 @@ public class PropertyManager {
 		}
 	}
 	
-	private static void fatalError(String error) {
+	private void fatalError(String error) {
 		try {
 			File output = new File(errorFileOutputPath);
 			ObjectOutputStream listOutputStream = new ObjectOutputStream(

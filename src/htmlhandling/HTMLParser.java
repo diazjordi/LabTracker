@@ -108,6 +108,12 @@ public class HTMLParser {
 		// Write out objects to local file
 			System.out.println("Writing Objects To Local Serialized File");
 				writeObjectsToFile(stuStations);
+		// Check % Offline, if above threshold error out
+		if(numOffline > (numUnits * .04)){
+			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
+			fatalError(error);
+			System.out.println((numUnits * .2));
+		}
 	}
 	
 	// Get properties from prop files
@@ -184,13 +190,10 @@ public class HTMLParser {
 			String status = getStationStatus(statusDivs.get(k).toString());
 			// Create stations.StudentStation object with extracted data and add
 			// station to ArrayList
-			StudentStation stu1 = new StudentStation(stationName, stationID,
-					status);
+			StudentStation stu1 = new StudentStation(stationName, stationID, status);
 			stuStations.add(k, stu1);
 		}
-	}
-	
-	
+	}	
 	
 	private void setCountVariables() {
 		// Set count variables
@@ -229,9 +232,7 @@ public class HTMLParser {
 		System.out.println(avail);
 		System.out.println(inUse);
 		System.out.println(off);
-	}
-
-	
+	}	
 
 	// Extracts station status from HTML div class="station"
 	private String getStationStatus(String statusDiv) {
@@ -351,6 +352,23 @@ public class HTMLParser {
 			}
 			// Close and clean output stream
 			listOutputStream.flush();
+			listOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void fatalError(String error) {
+		try {
+			File output = new File(errorFileOutputPath);
+			ObjectOutputStream listOutputStream = new ObjectOutputStream(
+					new FileOutputStream(output));
+			if (error.isEmpty()) {
+				listOutputStream.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
+			} else {
+				System.out.println(error);
+				listOutputStream.writeUTF(error);
+			}
 			listOutputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();

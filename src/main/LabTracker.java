@@ -16,6 +16,7 @@ public class LabTracker {
 	
 	// Main PropertyManager for LabTracker
 	private static PropertyManager propManager = new PropertyManager();
+	
 	// Error Handling
 	private static String errorFileOutputPath;
 	private static String error;

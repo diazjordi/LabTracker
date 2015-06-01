@@ -96,7 +96,4 @@ public class StudentStation implements Serializable {
                         " Station Status: " + stationStatus + "\n";
         return result;
     }
-
-
-
 }
