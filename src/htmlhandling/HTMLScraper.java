@@ -71,8 +71,7 @@ public class HTMLScraper {
 		// Iterate through Lab URLs and parse
 		Iterator it = labURLs.entrySet().iterator();
 		while (it.hasNext()) {
-			Map.Entry<String, String> pair = (Map.Entry<String, String>) it
-					.next();
+			Map.Entry<String, String> pair = (Map.Entry<String, String>) it.next();
 			scrapeSuccess = false;
 			System.out.println("Attempting To Scrape " + pair.getValue());
 			getHtmlFromPage(pair.getValue());

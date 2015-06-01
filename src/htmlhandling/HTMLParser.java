@@ -97,7 +97,8 @@ public class HTMLParser {
 				parseHTML();
 		// parse retrieved divs for data, create station stations and place in data structure
 			System.out.println("Creating Station Objects");
-				createStationObjects();		
+				createStationObjects();
+				setCountVariables();
 		// Write to HTML Map Page
 			System.out.println("Updating HTML Map With Object Data");
 				writeMapOfStationsToHTML(stuStations);
@@ -110,37 +111,84 @@ public class HTMLParser {
 	}
 	
 	// Get properties from prop files
-		private void getProps() throws IOException {
-			PropertyManager propManager = new PropertyManager();
-			// Get props
-			this.parserProperties = propManager.getParserProperties();
-			this.htmlProperties = propManager.getParserProperties();
-			this.databaseProperties = propManager.getParserProperties();
-			// Set props
-			this.parserInputPath           = parserProperties.get("parserInputPath");
-			this.parserOutputPath          = parserProperties.get("parserOutputPath");
-			this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
-			// Retrieve local template paths
-			this.htmlListTemplateFilePath  = htmlProperties.get("htmlListTemplateFilePath");
-			this.htmlMapTemplateFilePath   = htmlProperties.get("htmlMapTemplateFilePath");
-			this.htmlListOutputPath        = htmlProperties.get("htmlListOutputPath");
-			this.htmlMapOutputPath         = htmlProperties.get("htmlMapOutputPath");
-			// Retrieve Error path
-			this.errorFileOutputPath       = errorProperties.get("errorFileOutputPath");
-			// Retrieve DB properties
-			this.database                  = databaseProperties.get("db");
-			this.table                     = databaseProperties.get("db.table");
-			// Eventually log all of these out
-			System.out.println("Parser Input File Path: " + parserInputPath);
-			System.out.println("Parser Local Output File Path: " + parserOutputPath);
-			System.out.println("Supression File Path: " + parserSuppressionFilePath);
-			System.out.println("HTML List Template File Path: " + htmlListTemplateFilePath);	
-			System.out.println("HTML Map Template File Path: " + htmlMapTemplateFilePath);
-			System.out.println("HTML List Output Path: " + htmlListOutputPath);
-			System.out.println("HTML Map Output Path: " + htmlMapOutputPath);
-			System.out.println("Storage Database: " + database);
-			System.out.println("Storage Table: " + table);
+	private void getProps() throws IOException {
+		PropertyManager propManager = new PropertyManager();
+		// Get props
+		this.parserProperties = propManager.getParserProperties();
+		this.htmlProperties = propManager.getHtmlProperties();
+		this.databaseProperties = propManager.getDatabaseProperties();
+		// Set props
+		this.parserInputPath = parserProperties.get("parserInputPath");
+		this.parserOutputPath = parserProperties.get("parserOutputPath");
+		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
+		// Retrieve local template paths
+		this.htmlListTemplateFilePath = htmlProperties.get("htmlListTemplateFilePath");
+		this.htmlMapTemplateFilePath = htmlProperties.get("htmlMapTemplateFilePath");
+		this.htmlListOutputPath = htmlProperties.get("htmlListOutputPath");
+		this.htmlMapOutputPath = htmlProperties.get("htmlMapOutputPath");
+		// Retrieve Error path
+		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
+		// Retrieve DB properties
+		this.database = databaseProperties.get("db");
+		this.table = databaseProperties.get("db.table");
+		// Eventually log all of these out
+		System.out.println("Parser Input File Path: " + parserInputPath);
+		System.out.println("Parser Local Output File Path: " + parserOutputPath);
+		System.out.println("Supression File Path: " + parserSuppressionFilePath);
+		System.out.println("HTML List Template File Path: "	+ htmlListTemplateFilePath);
+		System.out.println("HTML Map Template File Path: " + htmlMapTemplateFilePath);
+		System.out.println("HTML List Output Path: " + htmlListOutputPath);
+		System.out.println("HTML Map Output Path: " + htmlMapOutputPath);
+		System.out.println("Storage Database: " + database);
+		System.out.println("Storage Table: " + table);
+	}
+
+	/**
+	 * Methods to extract needed fields from HTML These methods are not really
+	 * needed, but structure of HTML may change in the future. May be beneficial
+	 * to make code as modular as possible to avoid coding confusion later
+	 */
+	private void parseHTML() throws IOException {
+		try {
+			/**
+			 * Load HTML pulled from page into File then load file into Document
+			 * for parsing
+			 */
+			File input = new File(parserInputPath);
+			Document doc = Jsoup.parse(input, "UTF-8", "");
+			// Create elements out of relevant HTML divs
+			stationNameDivs = doc.getElementsByClass("station-label");
+			statusDivs = doc.getElementsByClass("station");
+			osImageDivs = doc.getElementsByClass("os-image"); // currently
+																// unused
+			// Set number of units in lab equal to number of HTML divs
+			numUnits = stationNameDivs.size();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Iterate through station divs, get relevant information out, then turn
+	 * them into stations and/or store all retrieved data in some sort of
+	 * persistent/saved data structure
+	 */
+	private void createStationObjects() {
+		// Iterates through divs containing station ID info
+		for (int k = 0; k < stationNameDivs.size(); k++) {
+			// Retrieves each station name from station name divs
+			String stationName = stationNameDivs.get(k).text();
+			// Retrieves each station ID from status divs
+			String stationID = statusDivs.get(k).id();
+			// Retrieves each station status
+			String status = getStationStatus(statusDivs.get(k).toString());
+			// Create stations.StudentStation object with extracted data and add
+			// station to ArrayList
+			StudentStation stu1 = new StudentStation(stationName, stationID,
+					status);
+			stuStations.add(k, stu1);
+		}
+	}
 	
 	
 	
@@ -182,53 +230,8 @@ public class HTMLParser {
 		System.out.println(inUse);
 		System.out.println(off);
 	}
-	
-	
-	
-	/**
-	 * Methods to extract needed fields from HTML These methods are not really
-	 * needed, but structure of HTML may change in the future. May be beneficial
-	 * to make code as modular as possible to avoid coding confusion later
-	 */
-	private void parseHTML() throws IOException {
-		try {
-			/** Load HTML pulled from page into File then load file into Document
-			 * for parsing
-			 */
-			File input = new File(parserInputPath);
-			Document doc = Jsoup.parse(input, "UTF-8", "");
-			// Create elements out of relevant HTML divs
-			stationNameDivs = doc.getElementsByClass("station-label");
-			statusDivs = doc.getElementsByClass("station");
-			osImageDivs = doc.getElementsByClass("os-image"); //currently unused
-			// Set number of units in lab equal to number of HTML divs
-			numUnits = stationNameDivs.size();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-	}
-
-	/**
-	 * Iterate through station divs, get relevant information out, then turn
-	 * them into stations and/or store all retrieved data in some sort of
-	 * persistent/saved data structure
-	 */
-	private void createStationObjects() {
-		// Iterates through divs containing station ID info
-		for (int k = 0; k < stationNameDivs.size(); k++) {
-			// Retrieves each station name from station name divs
-			String stationName = stationNameDivs.get(k).text();
-			// Retrieves each station ID from status divs
-			String stationID = statusDivs.get(k).id();
-			// Retrieves each station status
-			String status = getStationStatus(statusDivs.get(k).toString());
-			// Create stations.StudentStation object with extracted data and add
-			// station to ArrayList
-			StudentStation stu1 = new StudentStation(stationName, stationID, status);
-			stuStations.add(k, stu1);
-		}		
-	}
+	
 
 	// Extracts station status from HTML div class="station"
 	private String getStationStatus(String statusDiv) {

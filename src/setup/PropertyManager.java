@@ -1,5 +1,7 @@
 package setup;
 
+import htmlhandling.HTMLParser;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -93,8 +96,7 @@ public class PropertyManager {
 		// Test for LabURLs property
 		if (!mainProperties.getProperty("scraperLabURLsFile").isEmpty()) {
 			try {
-				File labUrlFile = new File(
-						mainProperties.getProperty("scraperLabURLsFile"));
+				File labUrlFile = new File(mainProperties.getProperty("scraperLabURLsFile"));
 				FileInputStream labFileInput = new FileInputStream(labUrlFile);
 				labURLProps.load(labFileInput);
 				Enumeration<?> labURLKeys = labURLProps.keys();
