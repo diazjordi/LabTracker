@@ -23,12 +23,12 @@ public class LabTracker {
 	private static String error;
 	
 	// Logger
-	private static final Logger logger = LogManager.getLogger(LabTracker.class.getName());
+	private static final Logger logger = LogManager.getLogger("LabTracker");
 	
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		
 		// Configure Logger
-		logger.error("*-----LabTracker Is Starting!-----*");
+		logger.trace("*-----LabTracker Is Starting!-----*");
 		//System.out.println();
 				
 		// Instigate Property pull
@@ -62,7 +62,7 @@ public class LabTracker {
 		File errorFile = new File(errorFileOutputPath);
 		// Check for existence of error file
 		if (errorFile.exists()) {
-			error = "LabTracker terminating, Error File detected! Resolve error and remove file resolve error to continue with next run!";
+			error = "LabTracker terminating, Error File detected! Resolve error and remove file to continue with next run!";
 			logger.fatal(error);
 			fatalError(error);
 			exists = true;

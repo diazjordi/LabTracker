@@ -6,6 +6,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import setup.PropertyManager;
@@ -49,9 +50,12 @@ public class HTMLScraper {
 	// Error Handling
 	private String errorFileOutputPath;
 	private String error;
+	
+	// Logger
+	private static final Logger logger = LogManager.getLogger("LabTracker");
 
 	public void run() throws IOException, SQLException, InterruptedException {
-		System.out.println("*-----HTMLScraper Is Starting!-----*");
+		logger.trace("*-----HTMLScraper Is Starting!-----*");
 		PropertyManager propManager = new PropertyManager();
 		// Get props
 		this.scraperProperties = propManager.getScraperProperties();
@@ -61,7 +65,7 @@ public class HTMLScraper {
 		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
 		this.numberOfAttempts = Integer.parseInt(scraperProperties.get("scraperNumberOfAttempts"));
 		this.scraperOutputPath = scraperProperties.get("scraperOutputPath");
-		System.out.println("Properties Set, Starting Scraping Process!");
+		logger.trace("Properties Set, Starting Scraping Process!");
 		// Run Parent Method to Control scraping
 		iterateURLsAndScrape();
 		
@@ -73,23 +77,22 @@ public class HTMLScraper {
 		while (it.hasNext()) {
 			Map.Entry<String, String> pair = (Map.Entry<String, String>) it.next();
 			scrapeSuccess = false;
-			System.out.println("Attempting To Scrape " + pair.getValue());
+			logger.trace("Attempting To Scrape " + pair.getValue());
 			getHtmlFromPage(pair.getValue());
 			if (scrapeSuccess) {
-				System.out.println("Scrape Successful, Commencing Parsing");
+				logger.trace("Scrape Successful, Commencing Parsing");
 				// Run HTMLParser on scraped output
 				HTMLParser parser = new HTMLParser();
 				parser.run(pair.getKey());
 			}
 		}
-		System.out.println("LabTracker has completed process, shutting down!!");
+		logger.trace("LabTracker has completed process, shutting down!!");
 	}
 
 	// Takes URL for map page, loads map page into memory
 	// searches for status div "the-pieces" and saves relevant html locally
 	// for parsing
-	private void getHtmlFromPage(String url) throws IOException,
-			InterruptedException {
+	private void getHtmlFromPage(String url) throws IOException, InterruptedException {
 		// To keep track of whether loads are successful
 		boolean pageLoaded = true;
 		boolean divLoaded = false;
@@ -103,6 +106,7 @@ public class HTMLScraper {
 		} catch (UnknownHostException a) {
 			// Log out error
 			error = "Unknown Host Exception for: " + url;
+			logger.error(error);
 			// Update Boolean to direct rest of process
 			pageLoaded = false;
 			// Close current web client
@@ -129,7 +133,7 @@ public class HTMLScraper {
 						// Update Boolean
 						divLoaded = true;
 						// Log out successful scrape
-						System.out.println(url + " contained requested HTML, successfully scraped and written to local file!");
+						logger.trace(url + " contained requested HTML, successfully scraped and written to local file!");
 						scrapeSuccess = true;
 						break;
 					} else if (mapPage.getElementById("the-pieces") == null) {
@@ -140,6 +144,7 @@ public class HTMLScraper {
 			// If no data was found update Boolean and log error
 			if (!divLoaded) {
 				error = url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!";
+				logger.error(error);
 				fatalError(error);
 			}
 		}

@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -85,32 +87,36 @@ public class HTMLParser {
 	// Error Handling
 	private String errorFileOutputPath;
 	private String error;
+	
+	// Logger
+	private static final Logger logger = LogManager.getLogger("LabTracker");
     
     
 	public void run(String currentLab) throws IOException, SQLException {
-		System.out.println("*-----HTMLParser Is Starting!-----*");
+		logger.trace("*-----HTMLParser Is Starting!-----*");
 		// Set props
-			System.out.println("Retrieving Parser Properties");
+			logger.trace("Retrieving Parser Properties");
 				getProps();
 		// parse HTML for needed fields/divs
-			System.out.println("Parsing HTML For Requested Data");
+			logger.trace("Parsing HTML For Requested Data");
 				parseHTML();
 		// parse retrieved divs for data, create station stations and place in data structure
-			System.out.println("Creating Station Objects");
+			logger.trace("Creating Station Objects");
 				createStationObjects();
 				setCountVariables();
 		// Write to HTML Map Page
-			System.out.println("Updating HTML Map With Object Data");
+			logger.trace("Updating HTML Map With Object Data");
 				writeMapOfStationsToHTML(stuStations);
 		// Write to DB
-			System.out.println("Writing Object Data To MYSQL DB");
+			logger.trace("Writing Object Data To MYSQL DB");
 				writeObjectsToTable(stuStations);
 		// Write out objects to local file
-			System.out.println("Writing Objects To Local Serialized File");
+			logger.trace("Writing Objects To Local Serialized File");
 				writeObjectsToFile(stuStations);
 		// Check % Offline, if above threshold error out
 		if(numOffline > (numUnits * .2)){
 			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
+			logger.error(error);
 			fatalError(error);
 		}
 	}
@@ -137,15 +143,15 @@ public class HTMLParser {
 		this.database = databaseProperties.get("db");
 		this.table = databaseProperties.get("db.table");
 		// Eventually log all of these out
-		System.out.println("Parser Input File Path: " + parserInputPath);
-		System.out.println("Parser Local Output File Path: " + parserOutputPath);
-		System.out.println("Supression File Path: " + parserSuppressionFilePath);
-		System.out.println("HTML List Template File Path: "	+ htmlListTemplateFilePath);
-		System.out.println("HTML Map Template File Path: " + htmlMapTemplateFilePath);
-		System.out.println("HTML List Output Path: " + htmlListOutputPath);
-		System.out.println("HTML Map Output Path: " + htmlMapOutputPath);
-		System.out.println("Storage Database: " + database);
-		System.out.println("Storage Table: " + table);
+		logger.trace("Parser Input File Path: " + parserInputPath);
+		logger.trace("Parser Local Output File Path: " + parserOutputPath);
+		logger.trace("Supression File Path: " + parserSuppressionFilePath);
+		logger.trace("HTML List Template File Path: "	+ htmlListTemplateFilePath);
+		logger.trace("HTML Map Template File Path: " + htmlMapTemplateFilePath);
+		logger.trace("HTML List Output Path: " + htmlListOutputPath);
+		logger.trace("HTML Map Output Path: " + htmlMapOutputPath);
+		logger.trace("Storage Database: " + database);
+		logger.trace("Storage Table: " + table);
 	}
 
 	/**
@@ -164,8 +170,7 @@ public class HTMLParser {
 			// Create elements out of relevant HTML divs
 			stationNameDivs = doc.getElementsByClass("station-label");
 			statusDivs = doc.getElementsByClass("station");
-			osImageDivs = doc.getElementsByClass("os-image"); // currently
-																// unused
+			osImageDivs = doc.getElementsByClass("os-image"); // currently unused
 			// Set number of units in lab equal to number of HTML divs
 			numUnits = stationNameDivs.size();
 		} catch (IOException e) {
@@ -211,10 +216,10 @@ public class HTMLParser {
 			}
 		}
 		numUnits = numAvail + numInUse + numOffline;
-		System.out.println("Total Number of Units: " + numUnits);
-		System.out.println("Number of Available: " + numAvail);
-		System.out.println("Number of In Use: " + numInUse);
-		System.out.println("Number of No Status: " + numOffline);
+		logger.trace("Total Number of Units: " + numUnits);
+		logger.trace("Number of Available: " + numAvail);
+		logger.trace("Number of In Use: " + numInUse);
+		logger.trace("Number of No Status: " + numOffline);
 		float numUnits1 = numUnits;
 		float numAvail1 = numAvail;
 		float numInUse1 = numInUse;
@@ -228,9 +233,9 @@ public class HTMLParser {
 		avail = "(Available - " + numAvail + ", " + numUnits + ", " + percAvail	+ "%)";
 		inUse = "(In Use    - " + numInUse + ", " + numUnits + ", " + percInUse	+ "%)";
 		off = "(Offline   - " + numOffline + ", " + numUnits + ", "	+ percOffline + "%)";
-		System.out.println(avail);
-		System.out.println(inUse);
-		System.out.println(off);
+		logger.trace(avail);
+		logger.trace(inUse);
+		logger.trace(off);
 	}	
 
 	// Extracts station status from HTML div class="station"
@@ -310,7 +315,7 @@ public class HTMLParser {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			System.out.println("MySQL JDBC Driver Not Found!");
+			logger.error("MySQL JDBC Driver Not Found!");
 			e.printStackTrace();
 			return;
 		}
@@ -323,13 +328,15 @@ public class HTMLParser {
 				String query = "INSERT INTO " + table + " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
 						+ " VALUES ('" + station.getStationNameShort()	+ "','"	+ station.getStationName() + "','" 
 						+ station.getStationID() + "','"	+ station.getStationStatus() + "','" + station.getStationOS() + "', NOW())";
-				//System.out.println(query);
+				logger.trace("MySQL Station Query: ");
+				logger.trace(query);
 				stmt.executeUpdate(query);
 			}
 			String logQuery = "INSERT INTO " + table + " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
 					+ " VALUES ('" + avail	+ "','"	+ inUse + "','" 
 					+ off + "','RunStatus','" + null + "', NOW())";
-			System.out.println(logQuery);
+			logger.trace("MySQL RunStatus Query: ");
+			logger.trace(logQuery);
 			stmt.executeUpdate(logQuery);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
