@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+	<Properties>
+		<Property name="log-path">/home/superlib/Desktop/LabTracker-Testing-2/Library-North-1st/logging/log4j/
+		</Property>
+	</Properties>
+
+
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+
+		<RollingFile name="RollingFile" 
+					 fileName="${log-path}/labtracker.log"
+					 filePattern="${log-path}/labtracker-%d{yyyy-MM-dd}-%i.log" append="true">
+			<PatternLayout>
+				<pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="5" />
+		</RollingFile>
+
+	</Appenders>
+
+	<Loggers>
+		<Logger name="root" level="trace" additivity="false">
+			<AppenderRef ref="RollingFiler" level="trace"/>
+			<AppenderRef ref="Console" />
+		</Logger>
+		<Root level="trace" additivity="false">
+			<AppenderRef ref="Console" />
+		</Root>
+	</Loggers>
+
+</Configuration>

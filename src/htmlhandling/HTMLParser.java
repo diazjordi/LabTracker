@@ -109,10 +109,9 @@ public class HTMLParser {
 			System.out.println("Writing Objects To Local Serialized File");
 				writeObjectsToFile(stuStations);
 		// Check % Offline, if above threshold error out
-		if(numOffline > (numUnits * .04)){
+		if(numOffline > (numUnits * .2)){
 			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
 			fatalError(error);
-			System.out.println((numUnits * .2));
 		}
 	}
 	
