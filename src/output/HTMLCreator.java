@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import setup.PropertyManager;
 import stations.StudentStation;
 
+@SuppressWarnings("unused")
 public class HTMLCreator {
 
     // HTML Templates & Properties
@@ -37,8 +38,7 @@ public class HTMLCreator {
 	private String error;
 	
 	// Logger
-	private static final Logger logger = LogManager.getLogger("LabTracker");
-	    
+	private static final Logger logger = LogManager.getLogger("LabTracker");	    
 	
 	// Get properties from prop files
 	private void getProps() throws IOException {

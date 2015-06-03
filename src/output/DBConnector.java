@@ -120,7 +120,6 @@ public class DBConnector {
 					+ " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
 					+ " VALUES ('" + avail + "','" + inUse + "','" + off
 					+ "','RunStatus','" + null + "', NOW())";
-			System.out.println(logQuery);
 			stmt.executeUpdate(logQuery);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
