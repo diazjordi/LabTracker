@@ -6,13 +6,15 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import htmlhandling.HTMLScraper;
+import retrieval.HTMLScraper;
 import setup.PropertyManager;
 
+// Main control class for LabTracker program
+// When ready for production, update Property file path in PropertyManager class
+// and chagne log output path in log4j2.xml
 public class LabTracker {
 	
 	// Main PropertyManager for LabTracker

@@ -1,4 +1,4 @@
-package htmlhandling;
+package retrieval;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;

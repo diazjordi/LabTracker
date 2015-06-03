@@ -1,7 +1,5 @@
 package setup;
 
-import htmlhandling.HTMLParser;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,11 +17,14 @@ import java.util.TreeMap;
 
 import org.apache.log4j.BasicConfigurator;
 
+import retrieval.HTMLParser;
+
+//When ready for production, update Property file path in PropertyManager class
 @SuppressWarnings("unused")
 public class PropertyManager {
 	
 	// General properties path
-    private static String propertyFilePath = "/home/superlib/Desktop/LabTracker-Testing-2/Library-North-1st/properties/LabTrackerProps.properties";
+    private static String propertyFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North-1st/properties/LabTrackerProps.properties";
 	private static Properties mainProperties = new Properties();
 	
 	// Scraper properties

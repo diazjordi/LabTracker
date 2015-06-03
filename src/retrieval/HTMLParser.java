@@ -1,35 +1,27 @@
-package htmlhandling;
+package retrieval;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.sql.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.text.*;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.mysql.jdbc.Statement;
+
+import org.apache.commons.*;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
+import org.apache.log4j.*;
+import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import output.DBConnector;
+import output.HTMLCreator;
 import setup.PropertyManager;
 import stations.StudentStation;
-
-import com.mysql.jdbc.Statement;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Need to implement ability to read multiple
@@ -41,28 +33,13 @@ public class HTMLParser {
 	
 	// Parser properties
     private Map<String, String> parserProperties = new HashMap<String, String>();
-    // HTML Templates & Properties
-    private Map<String, String> htmlProperties = new HashMap<String, String>();
     // Error File property
     private Map<String, String> errorProperties = new HashMap<String, String>();
-    // Database properties
-    private Map<String, String> databaseProperties = new HashMap<String, String>();
     
 	// Path to retrieve HTML for parsing
 	private String parserInputPath = null;
 	private String parserOutputPath = null;
 	private String parserSuppressionFilePath = null;
-	
-	// Paths to HTML template pages
-	private String htmlListTemplateFilePath = null;
-	private String htmlMapTemplateFilePath = null;
-	// Paths to output HTML pages
-	private String htmlListOutputPath = null;
-	private String htmlMapOutputPath = null;
-	
-	// DB props
-	private String database = null;
-	private String table = null;
 	
 	// Vars to track units
 	private Integer numUnits = 0;	
@@ -88,31 +65,36 @@ public class HTMLParser {
 	private String errorFileOutputPath;
 	private String error;
 	
+	// HTML Output Classes
+	private DBConnector dbConnector = new DBConnector();
+	private HTMLCreator htmlCreator = new HTMLCreator();
+	
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
-    
     
 	public void run(String currentLab) throws IOException, SQLException {
 		logger.trace("*-----HTMLParser Is Starting!-----*");
 		// Set props
-			logger.trace("Retrieving Parser Properties");
-				getProps();
+		logger.trace("Retrieving Parser Properties");
+		getProps();
 		// parse HTML for needed fields/divs
-			logger.trace("Parsing HTML For Requested Data");
-				parseHTML();
+		logger.trace("Parsing HTML For Requested Data");
+		parseHTML();
 		// parse retrieved divs for data, create station stations and place in data structure
-			logger.trace("Creating Station Objects");
-				createStationObjects();
-				setCountVariables();
+		logger.trace("Creating Station Objects");
+		createStationObjects();
+		setCountVariables();
 		// Write to HTML Map Page
-			logger.trace("Updating HTML Map With Object Data");
-				writeMapOfStationsToHTML(stuStations);
+		logger.trace("Updating HTML Map Page");
+		//writeMapOfStationsToHTML(stuStations);
+		htmlCreator.writeMapOfStationsToHTML(stuStations, avail, inUse, off);
 		// Write to DB
-			logger.trace("Writing Object Data To MYSQL DB");
-				writeObjectsToTable(stuStations);
+		logger.trace("Writing Data To MYSQL DB");
+		dbConnector.writeObjectsToTable(stuStations, avail, inUse, off);
+		dbConnector.writeRunStatusToTable(avail, inUse, off);
 		// Write out objects to local file
-			logger.trace("Writing Objects To Local Serialized File");
-				writeObjectsToFile(stuStations);
+		logger.trace("Writing Objects To Local Serialized File");
+		writeObjectsToFile(stuStations);
 		// Check % Offline, if above threshold error out
 		if(numOffline > (numUnits * .2)){
 			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
@@ -126,32 +108,16 @@ public class HTMLParser {
 		PropertyManager propManager = new PropertyManager();
 		// Get props
 		this.parserProperties = propManager.getParserProperties();
-		this.htmlProperties = propManager.getHtmlProperties();
-		this.databaseProperties = propManager.getDatabaseProperties();
 		// Set props
 		this.parserInputPath = parserProperties.get("parserInputPath");
 		this.parserOutputPath = parserProperties.get("parserOutputPath");
 		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
-		// Retrieve local template paths
-		this.htmlListTemplateFilePath = htmlProperties.get("htmlListTemplateFilePath");
-		this.htmlMapTemplateFilePath = htmlProperties.get("htmlMapTemplateFilePath");
-		this.htmlListOutputPath = htmlProperties.get("htmlListOutputPath");
-		this.htmlMapOutputPath = htmlProperties.get("htmlMapOutputPath");
 		// Retrieve Error path
 		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
-		// Retrieve DB properties
-		this.database = databaseProperties.get("db");
-		this.table = databaseProperties.get("db.table");
 		// Eventually log all of these out
 		logger.trace("Parser Input File Path: " + parserInputPath);
 		logger.trace("Parser Local Output File Path: " + parserOutputPath);
 		logger.trace("Supression File Path: " + parserSuppressionFilePath);
-		logger.trace("HTML List Template File Path: "	+ htmlListTemplateFilePath);
-		logger.trace("HTML Map Template File Path: " + htmlMapTemplateFilePath);
-		logger.trace("HTML List Output Path: " + htmlListOutputPath);
-		logger.trace("HTML Map Output Path: " + htmlMapOutputPath);
-		logger.trace("Storage Database: " + database);
-		logger.trace("Storage Table: " + table);
 	}
 
 	/**
@@ -209,9 +175,9 @@ public class HTMLParser {
 		for (StudentStation station : stuStations) {
 			if (station.getStationStatus().matches("Available")) {
 				numAvail++;
-			}else if (station.getStationStatus().matches("InUse")) {
+			} else if (station.getStationStatus().matches("InUse")) {
 				numInUse++;
-			}else if (station.getStationStatus().matches("Offline")) {
+			} else if (station.getStationStatus().matches("Offline")) {
 				numOffline++;
 			}
 		}
@@ -257,93 +223,6 @@ public class HTMLParser {
 		return stationStatus;
 	}
 	
-	// Writes stations to HTML Map File
-	private void writeMapOfStationsToHTML( ArrayList<StudentStation> stuStations) throws IOException {
-			File htmlMapTemplateFile = new File(htmlMapTemplateFilePath);
-			String htmlString = FileUtils.readFileToString(htmlMapTemplateFile);
-			// Color Strings
-			String availColor = "<FONT COLOR=\"#ffcb2f\">";
-			String noStatusColor = "<FONT COLOR=\"#595138\">";
-			String inUseColor = "<FONT COLOR=\"#665113\">";
-			// HTML Match Strings
-			String begMatch = "<!--$";
-			String endMatch ="-->";
-			for (StudentStation station : stuStations) {				
-				if (station.getStationStatus().matches("Available")) {
-					String completeMatch = begMatch + station.getStationNameShort() + endMatch;
-					if(htmlString.contains(completeMatch)){
-						htmlString = htmlString.replace(completeMatch, availColor);
-					}
-				}// Not currently displaying anything for In Use stations, leave blank
-				else if (station.getStationStatus().matches("InUse")) {
-					String completeMatch = begMatch + station.getStationNameShort() + endMatch;
-//					if(htmlString.contains(completeMatch)){
-//						htmlString = htmlString.replace(completeMatch, inUseColor);
-//					}					
-				}
-				else {
-					String completeMatch = begMatch + station.getStationNameShort() + endMatch;
-					if(htmlString.contains(completeMatch)){
-						htmlString = htmlString.replace(completeMatch, noStatusColor);
-					}
-				}
-			}
-			Date date = new Date();
-			DateFormat timeStamp = new SimpleDateFormat("h:mm a");
-			DateFormat dateStamp = new SimpleDateFormat("E, MMM dd");
-			String time = timeStamp.format(date).toString();
-			String date1 = dateStamp.format(date).toString();
-			htmlString = htmlString.replace("$time", time);
-			htmlString = htmlString.replace("$date", date1);
-			htmlString = htmlString.replace("$numAvail", numAvail.toString());
-			htmlString = htmlString.replace("$numUnits", numUnits.toString());
-			
-			htmlString = htmlString.replace("$availSummary", avail);
-			htmlString = htmlString.replace("$inUseSummary", inUse);
-			htmlString = htmlString.replace("$offSummary", off);
-			File newHtmlFile = new File(htmlMapOutputPath);
-			FileUtils.writeStringToFile(newHtmlFile, htmlString);
-		}
-
-	// Writes station objects data to MySQL DB
-	// table: allstationsv1
-	// fields: StationName, StationID, StationStatus, OS, DATE
-	private void writeObjectsToTable(ArrayList<StudentStation> stuStations) throws IOException,
-			SQLException {
-		// Iterate through ArrayList of student stations and write out to table
-		// for use by Node.js or Apache front end
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			logger.error("MySQL JDBC Driver Not Found!");
-			e.printStackTrace();
-			return;
-		}
-		// Initiate DB connection
-		Connection con = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/labtracker", "root", "MS2LflD?5");
-		try {
-			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			for (StudentStation station : stuStations) {
-				String query = "INSERT INTO " + table + " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-						+ " VALUES ('" + station.getStationNameShort()	+ "','"	+ station.getStationName() + "','" 
-						+ station.getStationID() + "','"	+ station.getStationStatus() + "','" + station.getStationOS() + "', NOW())";
-				logger.trace("MySQL Station Query: ");
-				logger.trace(query);
-				stmt.executeUpdate(query);
-			}
-			String logQuery = "INSERT INTO " + table + " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-					+ " VALUES ('" + avail	+ "','"	+ inUse + "','" 
-					+ off + "','RunStatus','" + null + "', NOW())";
-			logger.trace("MySQL RunStatus Query: ");
-			logger.trace(logQuery);
-			stmt.executeUpdate(logQuery);
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
-		con.close();
-	}
-
 	// Writes station objects to serialized file
 	private void writeObjectsToFile(ArrayList<StudentStation> stuStations) throws IOException {
 		// Iterate through ArrayList of student stations and write out to file
