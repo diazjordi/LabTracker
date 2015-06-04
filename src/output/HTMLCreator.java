@@ -55,9 +55,9 @@ public class HTMLCreator {
 		this.htmlMapOutputPath = htmlProperties.get("htmlMapOutputPath");
 		// Eventually log all of these out
 		logger.trace("htmlListTemplateFilePath: " + htmlListTemplateFilePath);
-		logger.trace("htmlListOutputPath : " + htmlListOutputPath );
-		logger.trace("htmlMapTemplateFilePath: " + htmlMapTemplateFilePath);
-		logger.trace("htmlMapOutputPath: " + htmlMapOutputPath);
+		logger.trace("htmlListOutputPath:       " + htmlListOutputPath );
+		logger.trace("htmlMapTemplateFilePath:  " + htmlMapTemplateFilePath);
+		logger.trace("htmlMapOutputPath:        " + htmlMapOutputPath);
 	}
 
 	// Writes stations to HTML Map File

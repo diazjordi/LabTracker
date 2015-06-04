@@ -33,6 +33,8 @@ public class HTMLParser {
 	
 	// Parser properties
     private Map<String, String> parserProperties = new HashMap<String, String>();
+    private Map<String, String> suppressionProperties = new HashMap<String, String>();
+    
     // Error File property
     private Map<String, String> errorProperties = new HashMap<String, String>();
     
@@ -84,6 +86,9 @@ public class HTMLParser {
 		logger.trace("Creating Station Objects");
 		createStationObjects();
 		setCountVariables();
+		// Update suppressed stations
+		logger.trace("Setting Suppressed Stations");
+		setSuppressedStations(stuStations, suppressionProperties);
 		// Write to HTML Map Page
 		logger.trace("Updating HTML Map Page");
 		//writeMapOfStationsToHTML(stuStations);
@@ -108,6 +113,7 @@ public class HTMLParser {
 		PropertyManager propManager = new PropertyManager();
 		// Get props
 		this.parserProperties = propManager.getParserProperties();
+		this.suppressionProperties = propManager.getSuppressionProperties();
 		// Set props
 		this.parserInputPath = parserProperties.get("parserInputPath");
 		this.parserOutputPath = parserProperties.get("parserOutputPath");
@@ -115,9 +121,9 @@ public class HTMLParser {
 		// Retrieve Error path
 		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
 		// Eventually log all of these out
-		logger.trace("Parser Input File Path: " + parserInputPath);
+		logger.trace("Parser Input File Path:        " + parserInputPath);
 		logger.trace("Parser Local Output File Path: " + parserOutputPath);
-		logger.trace("Supression File Path: " + parserSuppressionFilePath);
+		logger.trace("Supression File Path:          " + parserSuppressionFilePath);
 	}
 
 	/**
@@ -166,12 +172,6 @@ public class HTMLParser {
 	}	
 	
 	private void setCountVariables() {
-		// Set count variables
-		for (StudentStation station : stuStations) {
-			if (station.getStationName().matches("ec-pg9-ln1000")) {
-				station.setStationStatus("Suppressed");
-			}
-		}
 		for (StudentStation station : stuStations) {
 			if (station.getStationStatus().matches("Available")) {
 				numAvail++;
@@ -221,6 +221,24 @@ public class HTMLParser {
 			stationStatus = "NoStatusAvailable";
 		}
 		return stationStatus;
+	}
+	
+
+	@SuppressWarnings("rawtypes")
+	private void setSuppressedStations(ArrayList<StudentStation> stuStations, Map<String, String> suppressionProperties){
+		for(int i = 0 ; i < stuStations.size() ; i++){
+			// Iterate through Lab URLs and parse
+			Iterator it = suppressionProperties.entrySet().iterator();
+			while (it.hasNext()) {
+				 Map.Entry pair = (Map.Entry)it.next();
+				 if(stuStations.get(i).getStationName().matches(pair.getValue().toString())){
+					 stuStations.get(i).setStationStatus("Suppressed");
+				 }
+				 
+			        
+			}
+		}
+		
 	}
 	
 	// Writes station objects to serialized file

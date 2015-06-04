@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import retrieval.HTMLParser;
 
@@ -33,6 +35,7 @@ public class PropertyManager {
 
     // Parser properties
     private static Map<String, String> parserProperties = new HashMap<String, String>();
+    private static Map<String, String> suppressionProperties = new HashMap<String, String>();
     
     // Database properties
     private static Map<String, String> databaseProperties = new HashMap<String, String>();
@@ -46,6 +49,9 @@ public class PropertyManager {
     // Error Handling
  	private static String errorFileOutputPath;
  	private static String error;
+ 	
+ 	// Logger
+  	private static final Logger logger = LogManager.getLogger("LabTracker");
     
     public void loadProps() throws IOException{
 		// Load prop file into main property object
@@ -88,6 +94,8 @@ public class PropertyManager {
         }
 		// Set LabURLs into Map
 		retrieveLabURLs();
+		// Set Suppression list into Map
+		retrieveSuppressionList();
 	}
 	
 	
@@ -121,6 +129,34 @@ public class PropertyManager {
 		}
 	}
 	
+	private void retrieveSuppressionList() {
+		// Temp Properties object to load props from file
+		Properties suppressionProps = new Properties();
+		// Test for LabURLs property
+		if (!mainProperties.getProperty("parserSuppressionFilePath").isEmpty()) {
+			try {
+				File suppressionFile = new File(mainProperties.getProperty("parserSuppressionFilePath"));
+				FileInputStream suppressionFileInput = new FileInputStream(suppressionFile);
+				suppressionProps.load(suppressionFileInput);
+				Enumeration<?> suppressionKeys = suppressionProps.keys();
+				while (suppressionKeys.hasMoreElements()) { // Iterate through props
+					String suppressionProp = suppressionKeys.nextElement().toString();
+					if (!suppressionProps.getProperty(suppressionProp).isEmpty()) {
+						suppressionProperties.put(suppressionProp, suppressionProps.getProperty(suppressionProp));
+					} else if (suppressionProps.getProperty(suppressionProp).isEmpty()) {
+						// Log error for Suppression file
+						logger.trace("No Suppression File Provided");
+					}
+				}
+			} catch (IOException e) {
+				logger.trace("No Suppression File Provided");
+			}
+		} else if (mainProperties.getProperty("parserSuppressionFilePath").isEmpty()) {
+			logger.trace("No Suppression File Provided");
+			logger.error("No Suppression File Provided");
+		}
+	}
+	
 	private void fatalError(String error) {
 		try {
 			File output = new File(errorFileOutputPath);
@@ -150,6 +186,10 @@ public class PropertyManager {
 
 	public Map<String, String> getParserProperties() {
 		return parserProperties;
+	}
+	
+	public Map<String, String> getSuppressionProperties() {
+		return suppressionProperties;
 	}
 
 	public Map<String, String> getDatabaseProperties() {

@@ -90,7 +90,7 @@ public class DBConnector {
 						+ station.getStationID() + "','"
 						+ station.getStationStatus() + "','"
 						+ station.getStationOS() + "', NOW())";
-				// System.out.println(query);
+				logger.trace(query);
 				stmt.executeUpdate(query);
 			}
 		} catch (SQLException ex) {
@@ -120,6 +120,7 @@ public class DBConnector {
 					+ " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
 					+ " VALUES ('" + avail + "','" + inUse + "','" + off
 					+ "','RunStatus','" + null + "', NOW())";
+			logger.trace(logQuery);
 			stmt.executeUpdate(logQuery);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
