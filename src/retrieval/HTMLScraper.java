@@ -67,8 +67,7 @@ public class HTMLScraper {
 		this.scraperOutputPath = scraperProperties.get("scraperOutputPath");
 		logger.trace("Properties Set, Starting Scraping Process!");
 		// Run Parent Method to Control scraping
-		iterateURLsAndScrape();
-		
+		iterateURLsAndScrape();		
 	}
 	
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {

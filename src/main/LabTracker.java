@@ -16,47 +16,47 @@ import setup.PropertyManager;
 // When ready for production, update Property file path in PropertyManager class
 // and chagne log output path in log4j2.xml
 public class LabTracker {
-	
+
 	// Main PropertyManager for LabTracker
 	private static PropertyManager propManager = new PropertyManager();
-	
+
 	// Error Handling
 	private static String errorFileOutputPath;
 	private static String error;
-	
+
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
-	
-	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
-		
+
+	public static void main(String[] args) throws IOException, SQLException,
+			InterruptedException {
+
 		// Configure Logger
 		logger.trace("*-----LabTracker Is Starting!-----*");
-		//System.out.println();
-				
+
 		// Instigate Property pull
 		logger.trace("Loading Property Manager");
-		//System.out.println("Loading Property Manager");
 		propManager.loadProps();
-		
+
 		// Set props
 		logger.trace("Setting Error Properties");
-		errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");
-				
+		errorFileOutputPath = propManager.getErrorProperties().get(
+				"errorFileOutputPath");
+
 		// Check for Error File, if exists error out of program
 		logger.trace("Checking For Error File");
-		//System.out.println("Checking For Error File");
-		if(checkForErrorFile(errorFileOutputPath)){
+		// System.out.println("Checking For Error File");
+		if (checkForErrorFile(errorFileOutputPath)) {
 			System.exit(0);
 		} else {
 			logger.trace("Error File not detected!");
 		}
-		
-		// Initiate and pass Maps to HTMLScraper 
+
+		// Initiate and pass Maps to HTMLScraper
 		logger.trace("Initiating HTMLScraper");
 		HTMLScraper scraper = new HTMLScraper();
 		scraper.run();
 	}
-	
+
 	private static Boolean checkForErrorFile(String errorFileOutputPath) {
 		// logic boolean
 		boolean exists = false;
@@ -71,13 +71,15 @@ public class LabTracker {
 		}
 		return exists;
 	}
-	
+
 	private static void fatalError(String error) {
 		try {
 			File output = new File(errorFileOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(new FileOutputStream(output));
+			ObjectOutputStream listOutputStream = new ObjectOutputStream(
+					new FileOutputStream(output));
 			if (error.isEmpty()) {
-				listOutputStream.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
+				listOutputStream
+						.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
 			} else {
 				listOutputStream.writeUTF(error);
 				System.out.println(error);
