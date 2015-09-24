@@ -90,7 +90,6 @@ public class StudentStation implements Serializable {
 		} else {
 			name = this.stationName;
 		}
-		System.out.println(name);
 		return name;
 	}
 	@Override
