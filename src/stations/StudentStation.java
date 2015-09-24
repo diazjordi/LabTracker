@@ -1,7 +1,5 @@
 package stations;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +39,7 @@ public class StudentStation implements Serializable {
 		return stationNameShort;
 	}
 
+	@SuppressWarnings("unused")
 	private void setStationNameShort(String stationNameShortIn) {
 		this.stationNameShort = stationNameShortIn;
 	}
