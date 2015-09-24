@@ -23,7 +23,7 @@ public class StudentStation implements Serializable {
 	public StudentStation(String stationNameIn, String stationIDIn,
 			String stationStatusIn) {
 		this.stationName = stationNameIn;
-		this.stationNameShort = setStationNameShort(stationNameIn);
+		this.stationNameShort = parseStationNameShort(stationNameIn);
 		this.stationID = stationIDIn;
 		this.stationStatus = stationStatusIn;
 	}
@@ -31,72 +31,73 @@ public class StudentStation implements Serializable {
 	public StudentStation(String stationNameIn, String stationIDIn,
 			String stationStatusIn, String osIN) {
 		this.stationName = stationNameIn;
-		this.stationNameShort = setStationNameShort(stationNameIn);
+		this.stationNameShort = parseStationNameShort(stationNameIn);
 		this.stationID = stationIDIn;
 		this.stationStatus = stationStatusIn;
 		this.os = osIN;
 	}
-
-	private String setStationNameShort(String stationName) {
-		String name;
-		Pattern pat = Pattern.compile("(?<=ec-\\w)(\\w*)(?=-ln)");
-		Matcher mat = pat.matcher(stationName);
-		if (mat.find()) {
-			name = mat.group().toString();
-		} else {
-			name = this.stationName;
-		}
-		return name;
-	}
-
+	
 	public String getStationNameShort() {
 		return stationNameShort;
+	}
+
+	private void setStationNameShort(String stationNameShortIn) {
+		this.stationNameShort = stationNameShortIn;
 	}
 
 	public String getStationName() {
 		return stationName;
 	}
 
+	public void setStationName(String stationNameIN) {
+		this.stationName = stationNameIN;
+	}
+	
 	public String getStationID() {
 		return stationID;
+	}
+	
+	public void setStationID(String stationIDIN) {
+		this.stationID = stationIDIN;
 	}
 
 	public String getStationStatus() {
 		return stationStatus;
+	}
+	
+	public void setStationStatus(String stationStatusIN) {
+		this.stationStatus = stationStatusIN;
 	}
 
 	public String getStationOS() {
 		return os;
 	}
 
-	public void setStationName(String stationNameIN) {
-		this.stationName = stationNameIN;
-	}
-
-	public void setStationID(String stationIDIN) {
-		this.stationID = stationIDIN;
-	}
-
-	public void setStationStatus(String stationStatusIN) {
-		this.stationStatus = stationStatusIN;
-	}
-
 	public void setStationOS(String osIN) {
 		this.os = osIN;
 	}
-
-	private void writeObject(ObjectOutputStream aOutputStream)
-			throws IOException {
-		// perform the default serialization for all non-transient, non-static
-		// fields
-		aOutputStream.defaultWriteObject();
+	
+	private String parseStationNameShort(String stationName){
+		String name;
+		Pattern pat = Pattern.compile("(?<=ec-\\w)(\\w*)(?=-ln)");// old pattern
+		Matcher mat = pat.matcher(stationName);
+		Pattern pat2 = Pattern.compile("(?<=\\w{2}-\\w{6}-\\w)(\\w*)");// new pattern
+		Matcher mat2 = pat2.matcher(stationName);
+		if (mat.find()) {
+			name = mat.group().toString();
+		} else if (mat2.find()) {
+			name = mat2.group().toString();
+		} else {
+			name = this.stationName;
+		}
+		System.out.println(name);
+		return name;
 	}
-
 	@Override
 	public String toString() {
 		String result = " Station Name: " + stationName + "\n"
-				+ " Station ID: " + stationID + "\n" + " Station Status: "
-				+ stationStatus + "\n";
+				      + " Station ID: " + stationID + "\n" 
+				      + " Station Status: "  + stationStatus + "\n";
 		return result;
 	}
 }

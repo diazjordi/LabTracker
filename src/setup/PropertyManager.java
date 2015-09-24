@@ -26,7 +26,7 @@ import retrieval.HTMLParser;
 public class PropertyManager {
 	
 	// General properties path
-    private static String propertyFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North-1st/properties/LabTrackerProps.properties";
+    private static String propertyFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
 	private static Properties mainProperties = new Properties();
 	
 	// Scraper properties

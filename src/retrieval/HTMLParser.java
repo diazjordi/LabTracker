@@ -113,17 +113,13 @@ public class HTMLParser {
 	// Get properties from prop files
 	private void getProps() throws IOException {
 		PropertyManager propManager = new PropertyManager();
-		// Get props
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
-		// Set props
 		this.parserInputPath = parserProperties.get("parserInputPath");
 		this.parserOutputPath = parserProperties.get("parserOutputPath");
 		this.parserSuppressionFilePath = parserProperties
 				.get("parserSuppressionFilePath");
-		// Retrieve Error path
 		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
-		// Eventually log all of these out
 		logger.trace("Parser Input File Path:        " + parserInputPath);
 		logger.trace("Parser Local Output File Path: " + parserOutputPath);
 		logger.trace("Supression File Path:          "
@@ -146,9 +142,7 @@ public class HTMLParser {
 			// Create elements out of relevant HTML divs
 			stationNameDivs = doc.getElementsByClass("station-label");
 			statusDivs = doc.getElementsByClass("station");
-			osImageDivs = doc.getElementsByClass("os-image"); // currently
-																// unused
-			// Set number of units in lab equal to number of HTML divs
+			osImageDivs = doc.getElementsByClass("os-image");
 			numUnits = stationNameDivs.size();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -215,7 +209,6 @@ public class HTMLParser {
 
 	// Extracts station status from HTML div class="station"
 	private String getStationStatus(String statusDiv) {
-		// Use RegEx to extract station status from HTML
 		Pattern pat = Pattern.compile("(?<=Computer-01-)(\\w*)(?=\\.png)");
 		Matcher mat = pat.matcher(statusDiv);
 		String stationStatus;
@@ -236,7 +229,6 @@ public class HTMLParser {
 	private void setSuppressedStations(ArrayList<StudentStation> stuStations,
 			Map<String, String> suppressionProperties) {
 		for (int i = 0; i < stuStations.size(); i++) {
-			// Iterate through Lab URLs and parse
 			Iterator it = suppressionProperties.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry pair = (Map.Entry) it.next();
@@ -251,17 +243,13 @@ public class HTMLParser {
 	// Writes station objects to serialized file
 	private void writeObjectsToFile(ArrayList<StudentStation> stuStations)
 			throws IOException {
-		// Iterate through ArrayList of student stations and write out to file
 		try {
 			File output = new File(parserOutputPath);
-			// Create output stream for parsed objects
 			ObjectOutputStream listOutputStream = new ObjectOutputStream(
 					new FileOutputStream(output));
-			// Loop to iterate through list of objects
 			for (int i = 0; i < stuStations.size(); i++) {
 				listOutputStream.writeObject(stuStations.get(i).toString());
 			}
-			// Close and clean output stream
 			listOutputStream.flush();
 			listOutputStream.close();
 		} catch (IOException e) {
