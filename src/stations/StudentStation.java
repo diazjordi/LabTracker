@@ -93,9 +93,9 @@ public class StudentStation implements Serializable {
 	}
 	@Override
 	public String toString() {
-		String result = " Station Name: " + stationName + "\n"
-				      + " Station ID: " + stationID + "\n" 
-				      + " Station Status: "  + stationStatus + "\n";
+		String result = " Station Name:    " + stationName + "\n"
+				      + " Station ID:      " + stationID + "\n" 
+				      + " Station Status:  " + stationStatus + "\n";
 		return result;
 	}
 }

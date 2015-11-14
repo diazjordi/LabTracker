@@ -14,7 +14,7 @@ import setup.PropertyManager;
 
 // Main control class for LabTracker program
 // When ready for production, update Property file path in PropertyManager class
-// and chagne log output path in log4j2.xml
+// and change log output path in log4j2.xml
 public class LabTracker {
 	
 	// Main PropertyManager for LabTracker

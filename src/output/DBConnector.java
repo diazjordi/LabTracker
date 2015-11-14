@@ -60,7 +60,7 @@ public class DBConnector {
 		logger.trace("Password: " + password);
 	}
 
-	public void writeProgramStepsToTable(String avail, String inUse, String off)
+	public void write 	(String avail, String inUse, String off)
 			throws IOException, SQLException {
 		logger.trace("*-----DBConnector is Program Steps Data to Table!-----*");
 		// Initiate properties before run

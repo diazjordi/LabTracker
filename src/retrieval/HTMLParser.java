@@ -42,6 +42,9 @@ public class HTMLParser {
 	private String parserInputPath = null;
 	private String parserOutputPath = null;
 	private String parserSuppressionFilePath = null;
+	
+	// Data Threshold
+	private Integer parserReportingThreshold = 0;
 
 	// Vars to track units
 	private Integer numUnits = 0;
@@ -83,13 +86,16 @@ public class HTMLParser {
 		logger.trace("Parsing HTML For Requested Data");
 		parseHTML();
 		// parse retrieved divs for data, create station stations and place in
-		// data structure
+		// data structure, check for data errors
 		logger.trace("Creating Station Objects");
 		createStationObjects();
 		setCountVariables();
 		// Update suppressed stations
 		logger.trace("Setting Suppressed Stations");
 		setSuppressedStations(stuStations, suppressionProperties);
+		// Check % Offline, if above threshold error out
+		logger.trace("Checking Error Reporting Threshold");
+		detectDataErrors();
 		// Write to HTML Map Page
 		logger.trace("Updating HTML Map Page");
 		// writeMapOfStationsToHTML(stuStations);
@@ -103,11 +109,7 @@ public class HTMLParser {
 		writeObjectsToFile(stuStations);
 		// Check % Offline, if above threshold error out
 		logger.trace("Checking Error Reporting Threshold");
-		if (numOffline > (numUnits * .2)) {
-			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
-			logger.error(error);
-			fatalError(error);
-		}
+		detectDataErrors();
 	}
 
 	// Get properties from prop files
@@ -117,8 +119,8 @@ public class HTMLParser {
 		this.suppressionProperties = propManager.getSuppressionProperties();
 		this.parserInputPath = parserProperties.get("parserInputPath");
 		this.parserOutputPath = parserProperties.get("parserOutputPath");
-		this.parserSuppressionFilePath = parserProperties
-				.get("parserSuppressionFilePath");
+		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
+		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
 		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
 		logger.trace("Parser Input File Path:        " + parserInputPath);
 		logger.trace("Parser Local Output File Path: " + parserOutputPath);
@@ -206,6 +208,22 @@ public class HTMLParser {
 		logger.trace(inUse);
 		logger.trace(off);
 	}
+	
+	private void detectDataErrors() {
+		// check if num of stations offline/ not reporting is above acceptable threshold
+		double percentThreshold = parserReportingThreshold / 100;
+		double percentOffline = numOffline / numUnits;
+		if (percentOffline >= percentThreshold ){
+			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
+			logger.error(error);
+			fatalError(error);
+		}		
+		// check for zero data error
+		if(numAvail == 0 && numInUse == 0 && numOffline == 0){
+			logger.trace("Detected zero data error, will continue with next scheduled");
+			logger.trace("run but will denote error in DB RunStatus.");
+		}
+	}
 
 	// Extracts station status from HTML div class="station"
 	private String getStationStatus(String statusDiv) {
@@ -232,8 +250,7 @@ public class HTMLParser {
 			Iterator it = suppressionProperties.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry pair = (Map.Entry) it.next();
-				if (stuStations.get(i).getStationName()
-						.matches(pair.getValue().toString())) {
+				if (stuStations.get(i).getStationName().matches(pair.getValue().toString())) {
 					stuStations.get(i).setStationStatus("Suppressed");
 				}
 			}
@@ -245,8 +262,7 @@ public class HTMLParser {
 			throws IOException {
 		try {
 			File output = new File(parserOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(
-					new FileOutputStream(output));
+			ObjectOutputStream listOutputStream = new ObjectOutputStream(new FileOutputStream(output));
 			for (int i = 0; i < stuStations.size(); i++) {
 				listOutputStream.writeObject(stuStations.get(i).toString());
 			}
