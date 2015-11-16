@@ -81,6 +81,7 @@ public class PropertyManager {
 			}
 			else if(key.startsWith("parser")){
 				parserProperties.put(key, mainProperties.getProperty(key));
+				System.out.println(key + " : " + mainProperties.getProperty(key));
 			}
 			else if(key.startsWith("db")){
 				databaseProperties.put(key, mainProperties.getProperty(key));

@@ -107,9 +107,6 @@ public class HTMLParser {
 		// Write out objects to local file
 		logger.trace("Writing Objects To Local Serialized File");
 		writeObjectsToFile(stuStations);
-		// Check % Offline, if above threshold error out
-		logger.trace("Checking Error Reporting Threshold");
-		detectDataErrors();
 	}
 
 	// Get properties from prop files
@@ -124,8 +121,8 @@ public class HTMLParser {
 		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
 		logger.trace("Parser Input File Path:        " + parserInputPath);
 		logger.trace("Parser Local Output File Path: " + parserOutputPath);
-		logger.trace("Supression File Path:          "
-				+ parserSuppressionFilePath);
+		logger.trace("Supression File Path:          " + parserSuppressionFilePath);
+		logger.trace("Parser Reporting Threshold:    " + parserReportingThreshold + "%");
 	}
 
 	/**
@@ -211,8 +208,8 @@ public class HTMLParser {
 	
 	private void detectDataErrors() {
 		// check if num of stations offline/ not reporting is above acceptable threshold
-		double percentThreshold = parserReportingThreshold / 100;
-		double percentOffline = numOffline / numUnits;
+		double percentThreshold = (double) parserReportingThreshold / 100;
+		double percentOffline = (double) numOffline / numUnits;
 		if (percentOffline >= percentThreshold ){
 			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
 			logger.error(error);
