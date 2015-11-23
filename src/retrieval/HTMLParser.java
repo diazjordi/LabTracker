@@ -2,7 +2,6 @@ package retrieval;
 
 import java.io.*;
 import java.sql.*;
-import java.sql.Connection;
 import java.text.*;
 import java.util.*;
 import java.util.Date;
@@ -10,6 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.mysql.jdbc.Statement;
+
+import errors.*;
+import main.LabTracker;
 
 import org.apache.commons.*;
 import org.apache.commons.io.FileUtils;
@@ -67,8 +69,9 @@ public class HTMLParser {
 	private String off;
 
 	// Error Handling
-	private String errorFileOutputPath;
-	private String error;
+	private static FatalError fatalError = LabTracker.getFatalError();
+	private static MinorError minorError = LabTracker.getMinorError();
+	private static String error;
 
 	// Data Output Classes
 	private DBConnector dbConnector = new DBConnector();
@@ -118,7 +121,6 @@ public class HTMLParser {
 		this.parserOutputPath = parserProperties.get("parserOutputPath");
 		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
 		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
-		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
 		logger.trace("Parser Input File Path:        " + parserInputPath);
 		logger.trace("Parser Local Output File Path: " + parserOutputPath);
 		logger.trace("Supression File Path:          " + parserSuppressionFilePath);
@@ -164,8 +166,7 @@ public class HTMLParser {
 			String status = getStationStatus(statusDivs.get(k).toString());
 			// Create stations.StudentStation object with extracted data and add
 			// station to ArrayList
-			StudentStation stu1 = new StudentStation(stationName, stationID,
-					status);
+			StudentStation stu1 = new StudentStation(stationName, stationID,status);
 			stuStations.add(k, stu1);
 		}
 	}
@@ -213,7 +214,7 @@ public class HTMLParser {
 		if (percentOffline >= percentThreshold ){
 			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
 			logger.error(error);
-			fatalError(error);
+			FatalError.fatalErrorEncountered(error);
 		}		
 		// check for zero data error
 		if(numAvail == 0 && numInUse == 0 && numOffline == 0){
@@ -264,24 +265,6 @@ public class HTMLParser {
 				listOutputStream.writeObject(stuStations.get(i).toString());
 			}
 			listOutputStream.flush();
-			listOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void fatalError(String error) {
-		try {
-			File output = new File(errorFileOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(
-					new FileOutputStream(output));
-			if (error.isEmpty()) {
-				listOutputStream
-						.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
-			} else {
-				System.out.println(error);
-				listOutputStream.writeUTF(error);
-			}
 			listOutputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();

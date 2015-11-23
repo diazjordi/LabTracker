@@ -4,6 +4,10 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import errors.FatalError;
+import errors.MinorError;
+import main.LabTracker;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
@@ -48,8 +52,9 @@ public class HTMLScraper {
 	// Determines Whether To Attempt Parsing
 	private Boolean scrapeSuccess = false;
 	// Error Handling
-	private String errorFileOutputPath;
-	private String error;
+	private static FatalError fatalError = LabTracker.getFatalError();
+	private static MinorError minorError = LabTracker.getMinorError();
+	private static String error;
 	
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
@@ -59,7 +64,6 @@ public class HTMLScraper {
 		PropertyManager propManager = new PropertyManager();
 		// Get props
 		this.scraperProperties = propManager.getScraperProperties();
-		this.errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");
 		// Set props
 		this.labURLs = propManager.getLabURLs();
 		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
@@ -110,7 +114,7 @@ public class HTMLScraper {
 			pageLoaded = false;
 			// Close current web client
 			mapClient.closeAllWindows();
-			fatalError(error);
+			FatalError.fatalErrorEncountered(error);
 		}
 		// If page loaded successfully, continue with scrape attempt
 		if (pageLoaded) {
@@ -144,27 +148,9 @@ public class HTMLScraper {
 			if (!divLoaded) {
 				error = url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!";
 				logger.error(error);
-				fatalError(error);
+				FatalError.fatalErrorEncountered(error);
 			}
 		}
-	}
-
-	private void fatalError(String error) {
-		try {
-			File output = new File(errorFileOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(
-					new FileOutputStream(output));
-			if (error.isEmpty()) {
-				listOutputStream.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
-			} else {
-				System.out.println(error);
-				listOutputStream.writeUTF(error);
-			}
-			listOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.exit(0);
 	}
 
 }

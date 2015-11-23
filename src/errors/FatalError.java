@@ -7,36 +7,52 @@ import java.io.ObjectOutputStream;
 
 public class FatalError {
 	
-	private String classType;
-	private String errorInfo;
-	
-	private String errorFileOutputPath;
-	
-	
-	// Take in error info
-	
-	// Write error info out to error log
+	private static String errorFileOutputPath;
 		
-	// Write error info out to error DB
-	
-	// Send an email with error info
-	
-	private void fatalError(String error) {
-		try {
-			File output = new File(errorFileOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(
-					new FileOutputStream(output));
-			if (error.isEmpty()) {
-				listOutputStream
-						.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
-			} else {
-				System.out.println(error);
-				listOutputStream.writeUTF(error);
-			}
-			listOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public FatalError() {
+		super();
 	}
+	
+	public FatalError(String errorFileOutputPath){
+		super();
+		FatalError.errorFileOutputPath = errorFileOutputPath;
+	}
+		
+	public static String getErrorFileOutputPath() {
+		return errorFileOutputPath;
+	}
+
+	public static void setErrorFileOutputPath(String errorFileOutputPath) {
+		FatalError.errorFileOutputPath = errorFileOutputPath;
+	}
+
+	public static void fatalErrorEncountered(String errorInfo) {
+		if(errorFileOutputPath != null){
+			try {
+				File output = new File(errorFileOutputPath);
+				ObjectOutputStream listOutputStream = new ObjectOutputStream(new FileOutputStream(output));
+				if (errorInfo.isEmpty()) {
+					listOutputStream.writeUTF("Error Detected in LabTracker, please review logs and delete this file to enable next run");
+				} else {
+					System.out.println(errorInfo);
+					listOutputStream.writeUTF(errorInfo);
+				}
+				listOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+		} else {
+			System.out.println("No Error Output Path Set, program cannot continue!");
+			System.out.println("Program will now terminate!");
+			System.exit(0);
+		}		
+	}
+
+
+	
+	
+	
+	
+	
 
 }

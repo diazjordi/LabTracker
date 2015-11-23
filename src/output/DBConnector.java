@@ -1,9 +1,6 @@
 package output;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -19,17 +16,12 @@ import stations.StudentStation;
 
 import com.mysql.jdbc.Statement;
 
+import errors.FatalError;
+
 public class DBConnector {
 
 	// Database properties
 	private Map<String, String> databaseProperties = new HashMap<String, String>();
-
-	// Error File property
-	private Map<String, String> errorProperties = new HashMap<String, String>();
-
-	// Error Handling
-	private String errorFileOutputPath;
-	private String error;
 
 	// Database
 	private String database;
@@ -45,9 +37,6 @@ public class DBConnector {
 		PropertyManager propManager = new PropertyManager();
 		// Get props
 		this.databaseProperties = propManager.getDatabaseProperties();
-		this.errorProperties = propManager.getErrorProperties();
-		// Retrieve Error path
-		this.errorFileOutputPath = errorProperties.get("errorFileOutputPath");
 		// Retrieve DB properties
 		this.database = databaseProperties.get("db");
 		this.table = databaseProperties.get("db.table");
@@ -60,41 +49,10 @@ public class DBConnector {
 		logger.trace("Password: " + password);
 	}
 
-	public void write 	(String avail, String inUse, String off)
-			throws IOException, SQLException {
-		logger.trace("*-----DBConnector is Program Steps Data to Table!-----*");
-		// Initiate properties before run
-		getProps();
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			logger.error("MySQL JDBC Driver Not Found!");
-			fatalError(error);
-			return;
-		}
-		// Initiate DB connection
-		Connection con = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/" + database, username, password);
-		try {
-			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			String logQuery = "INSERT INTO "
-					+ table
-					+ " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-					+ " VALUES ('" + avail + "','" + inUse + "','" + off
-					+ "','RunStatus','" + null + "', NOW())";
-			logger.trace(logQuery);
-			stmt.executeUpdate(logQuery);
-		} catch (SQLException ex) {
-		}
-		con.close();
-	}
-
 	// Writes station objects data to MySQL DB
 	// table: allstationsv1
 	// fields: StationName, StationID, StationStatus, OS, DATE
-	public void writeObjectsToTable(ArrayList<StudentStation> stuStations,
-			String avail, String inUse, String off) throws IOException,
-			SQLException {
+	public void writeObjectsToTable(ArrayList<StudentStation> stuStations, String avail, String inUse, String off) throws IOException, SQLException {
 		logger.trace("*-----DBConnector is Writing Station Data to Table!-----*");
 		// Initiate properties before run
 		getProps();
@@ -104,13 +62,12 @@ public class DBConnector {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			logger.error("MySQL JDBC Driver Not Found!");
-			fatalError(error);
+			FatalError.fatalErrorEncountered(e.toString());
 			e.printStackTrace();
 			return;
 		}
 		// Initiate DB connection
-		Connection con = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/" + database, username, password);
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + database, username, password);
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
 			for (StudentStation station : stuStations) {
@@ -140,7 +97,7 @@ public class DBConnector {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			logger.error("MySQL JDBC Driver Not Found!");
-			fatalError(error);
+			FatalError.fatalErrorEncountered(e.toString());
 			return;
 		}
 		// Initiate DB connection
@@ -159,24 +116,4 @@ public class DBConnector {
 		}
 		con.close();
 	}
-
-	private void fatalError(String error) {
-		try {
-			File output = new File(errorFileOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(
-					new FileOutputStream(output));
-			if (error.isEmpty()) {
-				listOutputStream
-						.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
-			} else {
-				System.out.println(error);
-				listOutputStream.writeUTF(error);
-			}
-			listOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.exit(0);
-	}
-
 }

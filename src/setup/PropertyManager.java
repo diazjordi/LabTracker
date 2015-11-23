@@ -15,10 +15,14 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+import main.LabTracker;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import errors.FatalError;
+import errors.MinorError;
 import retrieval.HTMLParser;
 
 //When ready for production, update Property file path in PropertyManager class
@@ -47,7 +51,8 @@ public class PropertyManager {
     private static Map<String, String> htmlProperties = new HashMap<String, String>(); 
     
     // Error Handling
- 	private static String errorFileOutputPath;
+ 	private static FatalError fatalError = LabTracker.getFatalError();
+ 	private static MinorError minorError = LabTracker.getMinorError();
  	private static String error;
  	
  	// Logger
@@ -81,7 +86,6 @@ public class PropertyManager {
 			}
 			else if(key.startsWith("parser")){
 				parserProperties.put(key, mainProperties.getProperty(key));
-				System.out.println(key + " : " + mainProperties.getProperty(key));
 			}
 			else if(key.startsWith("db")){
 				databaseProperties.put(key, mainProperties.getProperty(key));
@@ -117,16 +121,16 @@ public class PropertyManager {
 					} else if (labURLProps.getProperty(labProp).isEmpty()) {
 						// Log error for Lab URL
 						error = "URL for " + labProp + " lab was not given!";
-						fatalError(error);
+						FatalError.fatalErrorEncountered(error);
 					}
 				}
 			} catch (IOException e) {
 				error = "Lab URLs File error!";
-				fatalError(error);
+				FatalError.fatalErrorEncountered(error);
 			}
 		} else if (mainProperties.getProperty("labURLsFile").isEmpty()) {
 			error = "No Lab URL File path given!";
-			fatalError(error);
+			FatalError.fatalErrorEncountered(error);
 		}
 	}
 	
@@ -155,24 +159,6 @@ public class PropertyManager {
 		} else if (mainProperties.getProperty("parserSuppressionFilePath").isEmpty()) {
 			logger.trace("No Suppression File Provided");
 			logger.error("No Suppression File Provided");
-		}
-	}
-	
-	private void fatalError(String error) {
-		try {
-			File output = new File(errorFileOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(
-					new FileOutputStream(output));
-			if (error.isEmpty()) {
-				listOutputStream
-						.writeUTF("Error Detected in HTMLScraper, please review logs and delete this file to enable next run");
-			} else {
-				System.out.println(error);
-				listOutputStream.writeUTF(error);
-			}
-			listOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	

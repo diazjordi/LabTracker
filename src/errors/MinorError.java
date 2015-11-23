@@ -1,18 +1,39 @@
 package errors;
 
+import java.util.HashMap;
+
 public class MinorError {
 	
-	private String classType;
-	private String errorInfo;
+	private static HashMap<String, String> errors = new HashMap<String, String>();
+	private static String errorFileOutputPath;
 	
-	private String errorFileOutputPath;
+	public MinorError() {
+		super();
+	}
 	
-	// Take in error info
+	public MinorError(String className, String error){
+		super();
+		MinorError.errors.put(className, error);
+	}
+
+	public static HashMap<String, String> getErrors() {
+		return errors;
+	}
+
+	public static void setErrors(HashMap<String, String> errors) {
+		MinorError.errors = errors;
+	}
+
+	public static String getErrorFileOutputPath() {
+		return errorFileOutputPath;
+	}
+
+	public static void setErrorFileOutputPath(String errorFileOutputPath) {
+		MinorError.errorFileOutputPath = errorFileOutputPath;
+	}
 	
-	// Write error info out to error log
-	
-	// Write error info out to error DB
-	
-	// Send an email with error info
+	public static void addMinorError(String className, String error){
+		MinorError.errors.put(className, error);
+	}	
 
 }
