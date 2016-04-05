@@ -2,19 +2,13 @@ package retrieval;
 
 import java.io.*;
 import java.sql.*;
-import java.text.*;
 import java.util.*;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.mysql.jdbc.Statement;
 
 import errors.*;
 import main.LabTracker;
 
-import org.apache.commons.*;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.*;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;

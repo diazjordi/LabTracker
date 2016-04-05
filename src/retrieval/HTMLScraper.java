@@ -9,26 +9,18 @@ import errors.MinorError;
 import main.LabTracker;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import setup.PropertyManager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Map.Entry;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Designed to open browser, navigate to
@@ -71,7 +63,7 @@ public class HTMLScraper {
 		this.scraperOutputPath = scraperProperties.get("scraperOutputPath");
 		logger.trace("Properties Set, Starting Scraping Process!");
 		// Run Parent Method to Control scraping
-		iterateURLsAndScrape();		
+		iterateURLsAndScrape();
 	}
 	
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {

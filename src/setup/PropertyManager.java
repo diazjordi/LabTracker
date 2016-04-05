@@ -2,28 +2,19 @@ package setup;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
-
 import main.LabTracker;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import errors.FatalError;
 import errors.MinorError;
-import retrieval.HTMLParser;
 
 //When ready for production, update Property file path in PropertyManager class
 @SuppressWarnings("unused")
@@ -43,6 +34,7 @@ public class PropertyManager {
     
     // Database properties
     private static Map<String, String> databaseProperties = new HashMap<String, String>();
+    private static Map<String, String> databaseTables = new HashMap<String, String>();
     
     // Error File property
     private static Map<String, String> errorProperties = new HashMap<String, String>();
@@ -89,6 +81,9 @@ public class PropertyManager {
 			}
 			else if(key.startsWith("db")){
 				databaseProperties.put(key, mainProperties.getProperty(key));
+			}
+			else if(key.startsWith("table")){
+				databaseTables.put(key, mainProperties.getProperty(key));
 			}
 			else if(key.startsWith("error")){
 				errorProperties.put(key, mainProperties.getProperty(key));
@@ -181,6 +176,10 @@ public class PropertyManager {
 
 	public Map<String, String> getDatabaseProperties() {
 		return databaseProperties;
+	}
+	
+	public Map<String, String> getDatabaseTables() {
+		return databaseTables;
 	}
 
 	public Map<String, String> getErrorProperties() {
