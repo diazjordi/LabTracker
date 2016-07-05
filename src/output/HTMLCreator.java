@@ -9,16 +9,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import main.LabTracker;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import errors.FatalError;
-import errors.MinorError;
 import setup.PropertyManager;
 import stations.StudentStation;
+import error.Error;
 
 @SuppressWarnings("unused")
 public class HTMLCreator {
@@ -34,9 +31,8 @@ public class HTMLCreator {
 	private String htmlMapOutputPath = null;
 
 	// Error Handling
-	private static FatalError fatalError = LabTracker.getFatalError();
-	private static MinorError minorError = LabTracker.getMinorError();
-	private static String error;
+	private static Error error = Error.geErrorInstance();
+	private static String errorInfo;
 
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");

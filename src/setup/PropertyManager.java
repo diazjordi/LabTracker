@@ -8,20 +8,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import main.LabTracker;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import errors.FatalError;
-import errors.MinorError;
+import error.Error;
 
 //When ready for production, update Property file path in PropertyManager class
 @SuppressWarnings("unused")
 public class PropertyManager {
 	
 	// General properties path
-    private static String propertyFilePath = "/home/superlib/Desktop/LabTracker/Library-North-1st/properties/LabTrackerProps.properties";
+    private static String propertyFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North/Properties/LabTrackerProps.properties";
 	private static Properties mainProperties = new Properties();
 	
 	// Scraper properties
@@ -43,9 +43,8 @@ public class PropertyManager {
     private static Map<String, String> htmlProperties = new HashMap<String, String>(); 
     
     // Error Handling
- 	private static FatalError fatalError = LabTracker.getFatalError();
- 	private static MinorError minorError = LabTracker.getMinorError();
- 	private static String error;
+ 	private static Error error = Error.geErrorInstance();
+ 	private static String errorInfo;
  	
  	// Logger
   	private static final Logger logger = LogManager.getLogger("LabTracker");
@@ -115,17 +114,17 @@ public class PropertyManager {
 						labURLs.put(labProp, labURLProps.getProperty(labProp));
 					} else if (labURLProps.getProperty(labProp).isEmpty()) {
 						// Log error for Lab URL
-						error = "URL for " + labProp + " lab was not given!";
-						FatalError.fatalErrorEncountered(error);
+						errorInfo = "URL for " + labProp + " lab was not given!";
+						error.fatalError(errorInfo);
 					}
 				}
 			} catch (IOException e) {
-				error = "Lab URLs File error!";
-				FatalError.fatalErrorEncountered(error);
+				errorInfo = "Lab URLs File error!";
+				error.fatalError(errorInfo);
 			}
 		} else if (mainProperties.getProperty("labURLsFile").isEmpty()) {
-			error = "No Lab URL File path given!";
-			FatalError.fatalErrorEncountered(error);
+			errorInfo = "No Lab URL File path given!";
+			error.fatalError(errorInfo);
 		}
 	}
 	

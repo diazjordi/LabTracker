@@ -6,7 +6,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import errors.*;
+import error.*;
+import error.Error;
 import main.LabTracker;
 
 import org.apache.log4j.*;
@@ -63,9 +64,8 @@ public class HTMLParser {
 	private String off;
 
 	// Error Handling
-	private static FatalError fatalError = LabTracker.getFatalError();
-	private static MinorError minorError = LabTracker.getMinorError();
-	private static String error;
+	private static Error error = Error.geErrorInstance();
+	private static String errorInfo;
 
 	// Data Output Classes
 	private DBConnector dbConnector = new DBConnector();
@@ -206,9 +206,9 @@ public class HTMLParser {
 		double percentThreshold = (double) parserReportingThreshold / 100;
 		double percentOffline = (double) numOffline / numUnits;
 		if (percentOffline >= percentThreshold ){
-			error = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
+			errorInfo = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
 			logger.error(error);
-			FatalError.fatalErrorEncountered(error);
+			error.fatalError(errorInfo);
 		}		
 		// check for zero data error
 		if(numAvail == 0 && numInUse == 0 && numOffline == 0){

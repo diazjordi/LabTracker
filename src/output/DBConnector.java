@@ -16,7 +16,7 @@ import stations.StudentStation;
 
 import com.mysql.jdbc.Statement;
 
-import errors.FatalError;
+import error.Error;
 
 public class DBConnector {
 
@@ -28,6 +28,10 @@ public class DBConnector {
 	private String table;
 	private String username;
 	private String password;
+	
+	// Error Handling
+	private static Error error = Error.geErrorInstance();
+	private static String errorInfo;
 
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
@@ -62,7 +66,7 @@ public class DBConnector {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			logger.error("MySQL JDBC Driver Not Found!");
-			FatalError.fatalErrorEncountered(e.toString());
+			error.fatalError(e.toString());
 			e.printStackTrace();
 			return;
 		}
@@ -97,7 +101,7 @@ public class DBConnector {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			logger.error("MySQL JDBC Driver Not Found!");
-			FatalError.fatalErrorEncountered(e.toString());
+			error.fatalError(e.toString());
 			return;
 		}
 		// Initiate DB connection

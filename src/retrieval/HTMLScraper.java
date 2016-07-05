@@ -4,8 +4,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-import errors.FatalError;
-import errors.MinorError;
+import error.Error;
 import main.LabTracker;
 
 import org.apache.commons.io.FileUtils;
@@ -44,9 +43,8 @@ public class HTMLScraper {
 	// Determines Whether To Attempt Parsing
 	private Boolean scrapeSuccess = false;
 	// Error Handling
-	private static FatalError fatalError = LabTracker.getFatalError();
-	private static MinorError minorError = LabTracker.getMinorError();
-	private static String error;
+	private static Error error = Error.geErrorInstance();
+	private static String errorInfo;
 	
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
@@ -100,13 +98,13 @@ public class HTMLScraper {
 			mapPage = mapClient.getPage(url);
 		} catch (UnknownHostException a) {
 			// Log out error
-			error = "Unknown Host Exception for: " + url;
+			errorInfo = "Unknown Host Exception for: " + url;
 			logger.error(error);
 			// Update Boolean to direct rest of process
 			pageLoaded = false;
 			// Close current web client
 			mapClient.closeAllWindows();
-			FatalError.fatalErrorEncountered(error);
+			error.fatalError(errorInfo);
 		}
 		// If page loaded successfully, continue with scrape attempt
 		if (pageLoaded) {
@@ -132,15 +130,15 @@ public class HTMLScraper {
 						scrapeSuccess = true;
 						break;
 					} else if (mapPage.getElementById("the-pieces") == null) {
-						error = url	+ " did not contain requested HTML, will try again " + (numberOfAttempts - i) + " times!";
+						errorInfo = url	+ " did not contain requested HTML, will try again " + (numberOfAttempts - i) + " times!";
 					}
 				}
 			}
 			// If no data was found update Boolean and log error
 			if (!divLoaded) {
-				error = url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!";
+				errorInfo = url + " did not contain requested HTML, made " + numberOfAttempts + " attempts to retrieve!";
 				logger.error(error);
-				FatalError.fatalErrorEncountered(error);
+				error.fatalError(errorInfo);
 			}
 		}
 	}
