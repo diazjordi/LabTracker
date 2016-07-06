@@ -108,7 +108,7 @@ public class HTMLParser {
 
 	// Get properties from prop files
 	private void getProps() throws IOException {
-		PropertyManager propManager = new PropertyManager();
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
 		this.parserInputPath = parserProperties.get("parserInputPath");

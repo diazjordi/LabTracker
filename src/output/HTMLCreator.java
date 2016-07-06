@@ -39,7 +39,7 @@ public class HTMLCreator {
 
 	// Get properties from prop files
 	private void getProps() throws IOException {
-		PropertyManager propManager = new PropertyManager();
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		// Get props
 		this.htmlProperties = propManager.getHtmlProperties();
 		// Retrieve HTML props
