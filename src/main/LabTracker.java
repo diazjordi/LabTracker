@@ -15,11 +15,11 @@ import error.Error;
 // and change log output path in log4j2.xml
 public class LabTracker {
 	
-	// Main PropertyManager for LabTracker
-	private static PropertyManager propManager = new PropertyManager();
+	// Singleton PropertyManager
+	private static PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 	
-	// Error Handling
-	private static Error error = Error.geErrorInstance();
+	// Singleton Error Handling
+	private static Error error = Error.getErrorInstance();
 	private static String errorFileOutputPath;
 	
 	// Logger
@@ -40,7 +40,7 @@ public class LabTracker {
 		error.checkForErrorFile(errorFileOutputPath);
 		logger.trace("Error File not detected!");
 		
-		// Initiate and pass Maps to HTMLScraper 
+		// Initiate HTMLScraper 
 		logger.trace("Initiating HTMLScraper");
 		HTMLScraper scraper = new HTMLScraper();
 		scraper.run();

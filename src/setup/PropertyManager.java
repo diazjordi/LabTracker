@@ -20,6 +20,8 @@ import error.Error;
 @SuppressWarnings("unused")
 public class PropertyManager {
 	
+	private static PropertyManager propertyManagerInstance;
+	
 	// General properties path
     private static String propertyFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North/Properties/LabTrackerProps.properties";
 	private static Properties mainProperties = new Properties();
@@ -43,11 +45,21 @@ public class PropertyManager {
     private static Map<String, String> htmlProperties = new HashMap<String, String>(); 
     
     // Error Handling
- 	private static Error error = Error.geErrorInstance();
+ 	private static Error error = Error.getErrorInstance();
  	private static String errorInfo;
  	
  	// Logger
   	private static final Logger logger = LogManager.getLogger("LabTracker");
+  	
+  	private PropertyManager() {
+    }
+    
+    public static PropertyManager getPropertyManagerInstance() {
+        if (null == propertyManagerInstance) {
+        	propertyManagerInstance = new PropertyManager();
+        }
+        return propertyManagerInstance;
+    }
     
     public void loadProps() throws IOException{
 		// Load prop file into main property object
@@ -60,8 +72,7 @@ public class PropertyManager {
 		if(!mainProperties.isEmpty()){
 			this.setProps();
 		}else if (mainProperties.isEmpty()){
-			System.out.println("No Properties Found!");
-			System.exit(0);
+			error.fatalError("No Properties Found!");
 		}
 	}
 	
@@ -115,7 +126,7 @@ public class PropertyManager {
 					} else if (labURLProps.getProperty(labProp).isEmpty()) {
 						// Log error for Lab URL
 						errorInfo = "URL for " + labProp + " lab was not given!";
-						error.fatalError(errorInfo);
+						error.fatalError(errorInfo);// *REVISE*
 					}
 				}
 			} catch (IOException e) {
@@ -152,7 +163,6 @@ public class PropertyManager {
 			}
 		} else if (mainProperties.getProperty("parserSuppressionFilePath").isEmpty()) {
 			logger.trace("No Suppression File Provided");
-			logger.error("No Suppression File Provided");
 		}
 	}
 	

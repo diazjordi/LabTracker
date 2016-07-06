@@ -30,7 +30,7 @@ public class DBConnector {
 	private String password;
 	
 	// Error Handling
-	private static Error error = Error.geErrorInstance();
+	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
 	// Logger
@@ -38,7 +38,7 @@ public class DBConnector {
 
 	// Get properties from prop files
 	private void getProps() throws IOException {
-		PropertyManager propManager = new PropertyManager();
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		// Get props
 		this.databaseProperties = propManager.getDatabaseProperties();
 		// Retrieve DB properties
@@ -46,11 +46,6 @@ public class DBConnector {
 		this.table = databaseProperties.get("db.table");
 		this.username = databaseProperties.get("db.username");
 		this.password = databaseProperties.get("db.password");
-		// Eventually log all of these out
-		logger.trace("Database: " + database);
-		logger.trace("Table: " + table);
-		logger.trace("Username: " + username);
-		logger.trace("Password: " + password);
 	}
 
 	// Writes station objects data to MySQL DB

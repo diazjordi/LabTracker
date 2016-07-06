@@ -64,7 +64,7 @@ public class HTMLParser {
 	private String off;
 
 	// Error Handling
-	private static Error error = Error.geErrorInstance();
+	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
 	// Data Output Classes

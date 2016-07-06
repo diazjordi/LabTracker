@@ -31,7 +31,7 @@ public class HTMLCreator {
 	private String htmlMapOutputPath = null;
 
 	// Error Handling
-	private static Error error = Error.geErrorInstance();
+	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
 	// Logger

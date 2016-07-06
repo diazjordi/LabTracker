@@ -43,7 +43,7 @@ public class HTMLScraper {
 	// Determines Whether To Attempt Parsing
 	private Boolean scrapeSuccess = false;
 	// Error Handling
-	private static Error error = Error.geErrorInstance();
+	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 	
 	// Logger
@@ -51,7 +51,7 @@ public class HTMLScraper {
 
 	public void run() throws IOException, SQLException, InterruptedException {
 		logger.trace("*-----HTMLScraper Is Starting!-----*");
-		PropertyManager propManager = new PropertyManager();
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		// Get props
 		this.scraperProperties = propManager.getScraperProperties();
 		// Set props
@@ -67,16 +67,18 @@ public class HTMLScraper {
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {
 		// Iterate through Lab URLs and parse
 		Iterator it = labURLs.entrySet().iterator();
+		String currentLab;
 		while (it.hasNext()) {
 			Map.Entry<String, String> pair = (Map.Entry<String, String>) it.next();
 			scrapeSuccess = false;
 			logger.trace("Attempting To Scrape " + pair.getValue());
+			System.out.println(pair.getKey());
 			getHtmlFromPage(pair.getValue());
 			if (scrapeSuccess) {
 				logger.trace("Scrape Successful, Commencing Parsing");
 				// Run HTMLParser on scraped output
 				HTMLParser parser = new HTMLParser();
-				parser.run(pair.getKey());
+				//parser.run(pair.getKey());
 			}
 		}
 		logger.trace("LabTracker has completed process, shutting down!!");

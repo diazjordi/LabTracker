@@ -17,7 +17,7 @@ public class Error {
     private Error() {
     }
     
-    public static Error geErrorInstance() {
+    public static Error getErrorInstance() {
         if (null == errorInstance) {
             errorInstance = new Error();
         }
