@@ -6,9 +6,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import error.*;
+import dataobjects.Lab;
+import dataobjects.StudentStation;
 import error.Error;
-import main.LabTracker;
 
 import org.apache.log4j.*;
 import org.jsoup.*;
@@ -18,16 +18,16 @@ import org.jsoup.select.Elements;
 import output.DBConnector;
 import output.HTMLCreator;
 import setup.PropertyManager;
-import stations.StudentStation;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Need to implement ability to read multiple
  * files and delete upon completion, no hard coding. Export ArrayList to local
  * file or DB.
  */
-@SuppressWarnings("unused")
 public class HTMLParser {
-
+	
+	private Lab currentLab = new Lab();
+	
 	// Parser properties
 	private Map<String, String> parserProperties = new HashMap<String, String>();
 	private Map<String, String> suppressionProperties = new HashMap<String, String>();
@@ -74,8 +74,9 @@ public class HTMLParser {
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
 
-	public void run(String currentLab) throws IOException, SQLException {
+	public void run(Lab currentLab) throws IOException, SQLException {
 		logger.trace("*-----HTMLParser Is Starting!-----*");
+		this.currentLab = currentLab;
 		// Set props
 		logger.trace("Retrieving Parser Properties");
 		getProps();
@@ -111,8 +112,8 @@ public class HTMLParser {
 		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
-		this.parserInputPath = parserProperties.get("parserInputPath");
-		this.parserOutputPath = parserProperties.get("parserOutputPath");
+		this.parserInputPath = parserProperties.get("parserInputPath") + currentLab.getLabName();//Add Lab Name as part of path
+		this.parserOutputPath = parserProperties.get("parserOutputPath") + currentLab.getLabName();//Add Lab Name as part of path
 		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
 		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
 		logger.trace("Parser Input File Path:        " + parserInputPath);
@@ -127,21 +128,18 @@ public class HTMLParser {
 	 * to make code as modular as possible to avoid coding confusion later
 	 */
 	private void parseHTML() throws IOException {
-		try {
-			/**
-			 * Load HTML pulled from page into File then load file into Document
-			 * for parsing
-			 */
-			File input = new File(parserInputPath);
-			Document doc = Jsoup.parse(input, "UTF-8", "");
-			// Create elements out of relevant HTML divs
-			stationNameDivs = doc.getElementsByClass("station-label");
-			statusDivs = doc.getElementsByClass("station");
-			osImageDivs = doc.getElementsByClass("os-image");
-			numUnits = stationNameDivs.size();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		/**
+		 * Load HTML pulled from page into File then load file into Document
+		 * for parsing
+		 */
+		//File input = new File(parserInputPath);
+		//Document doc = Jsoup.parse(input, "UTF-8", "");
+		Document doc = Jsoup.parse(currentLab.getScrapedHTML());
+		// Create elements out of relevant HTML divs
+		stationNameDivs = doc.getElementsByClass("station-label");
+		statusDivs = doc.getElementsByClass("station");
+		osImageDivs = doc.getElementsByClass("os-image");
+		numUnits = stationNameDivs.size();
 	}
 
 	/**

@@ -47,10 +47,10 @@ public class PropertyManager {
     // Error Handling
  	private static Error error = Error.getErrorInstance();
  	private static String errorInfo;
- 	
+ 	  	
  	// Logger
-  	private static final Logger logger = LogManager.getLogger("LabTracker");
-  	
+ 	private static final Logger logger = LogManager.getLogger("LabTracker");
+ 	
   	private PropertyManager() {
     }
     

@@ -13,8 +13,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import dataobjects.StudentStation;
 import setup.PropertyManager;
-import stations.StudentStation;
 import error.Error;
 
 @SuppressWarnings("unused")

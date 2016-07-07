@@ -11,13 +11,15 @@ import java.util.Map;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import main.LabTracker;
 import setup.PropertyManager;
-import stations.StudentStation;
 
 import com.mysql.jdbc.Statement;
 
+import dataobjects.StudentStation;
 import error.Error;
 
+@SuppressWarnings("unused")
 public class DBConnector {
 
 	// Database properties
@@ -30,9 +32,9 @@ public class DBConnector {
 	private String password;
 	
 	// Error Handling
-	private static Error error = Error.getErrorInstance();
+	private static Error error = Error.getErrorInstance();	
 	private static String errorInfo;
-
+	
 	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
 

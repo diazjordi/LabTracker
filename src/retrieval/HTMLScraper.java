@@ -1,18 +1,5 @@
 package retrieval;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
-import error.Error;
-import main.LabTracker;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import setup.PropertyManager;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -20,35 +7,41 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import setup.PropertyManager;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
+import dataobjects.Lab;
+import error.Error;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Designed to open browser, navigate to
  * status web page, find HTML code for current status of PC's then fetch that
  * specific HTML div and save it locally for parsing by separate class
  */
-
-@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class HTMLScraper {
 
-	// Scraper properties
 	private Map<String, String> scraperProperties = new HashMap<String, String>();
-	// URLs to scrape
 	private Map<String, String> labURLs = new HashMap<String, String>();
-	// Amount of time to sleep while page loads
+	private Lab currentLab = new Lab();
 	private int threadSleep;
-	// Number of times to try and scrape page
 	private int numberOfAttempts;
-	// Path and file name to store scraped HTML under
 	private String scraperOutputPath = null;
-	// Determines Whether To Attempt Parsing
 	private Boolean scrapeSuccess = false;
-	// Error Handling
+	private String scrapedHTML = null;
 	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
-	
-	// Logger
-	private static final Logger logger = LogManager.getLogger("LabTracker");
 
+	private static final Logger logger = LogManager.getLogger("LabTracker");
+	
 	public void run() throws IOException, SQLException, InterruptedException {
 		logger.trace("*-----HTMLScraper Is Starting!-----*");
 		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
@@ -58,27 +51,26 @@ public class HTMLScraper {
 		this.labURLs = propManager.getLabURLs();
 		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
 		this.numberOfAttempts = Integer.parseInt(scraperProperties.get("scraperNumberOfAttempts"));
-		this.scraperOutputPath = scraperProperties.get("scraperOutputPath");
+		this.scraperOutputPath = scraperProperties.get("scraperOutputPath");//Add Lab Name as part of path
 		logger.trace("Properties Set, Starting Scraping Process!");
 		// Run Parent Method to Control scraping
 		iterateURLsAndScrape();
 	}
 	
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {
-		// Iterate through Lab URLs and parse
-		Iterator it = labURLs.entrySet().iterator();
-		String currentLab;
+		Iterator<Entry<String, String>> it = labURLs.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, String> pair = (Map.Entry<String, String>) it.next();
 			scrapeSuccess = false;
 			logger.trace("Attempting To Scrape " + pair.getValue());
-			System.out.println(pair.getKey());
 			getHtmlFromPage(pair.getValue());
+			currentLab.setLabName(pair.getKey());
+			currentLab.setScrapedHTML(scrapedHTML);
+			System.out.println(currentLab.toString());
 			if (scrapeSuccess) {
 				logger.trace("Scrape Successful, Commencing Parsing");
-				// Run HTMLParser on scraped output
 				HTMLParser parser = new HTMLParser();
-				//parser.run(pair.getKey());
+				parser.run(currentLab);
 			}
 		}
 		logger.trace("LabTracker has completed process, shutting down!!");
@@ -88,6 +80,7 @@ public class HTMLScraper {
 	// searches for status div "the-pieces" and saves relevant html locally
 	// for parsing
 	private void getHtmlFromPage(String url) throws IOException, InterruptedException {
+		String htmlString;
 		// To keep track of whether loads are successful
 		boolean pageLoaded = true;
 		boolean divLoaded = false;
@@ -120,19 +113,21 @@ public class HTMLScraper {
 					// Check page for requested div
 					if (mapPage.getElementById("the-pieces") != null) {
 						// Create file to save HTML
-						File scrapedHTML = new File(scraperOutputPath);
+						File scrapedHTMLFile = new File(scraperOutputPath + currentLab.getLabName());
 						// Create string from requested html div
-						String htmlString = mapPage.getElementById("the-pieces").asXml();
+						htmlString = mapPage.getElementById("the-pieces").asXml();
 						// Write to file
-						FileUtils.writeStringToFile(scrapedHTML, htmlString);
+						FileUtils.writeStringToFile(scrapedHTMLFile, htmlString);
 						// Update Boolean
 						divLoaded = true;
 						// Log out successful scrape
 						logger.trace(url + " contained requested HTML, successfully scraped and written to local file!");
 						scrapeSuccess = true;
+						scrapedHTML = htmlString;
 						break;
 					} else if (mapPage.getElementById("the-pieces") == null) {
 						errorInfo = url	+ " did not contain requested HTML, will try again " + (numberOfAttempts - i) + " times!";
+						logger.trace(errorInfo);
 					}
 				}
 			}

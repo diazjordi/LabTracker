@@ -23,7 +23,7 @@ public class LabTracker {
 	private static String errorFileOutputPath;
 	
 	// Logger
-	public static final Logger logger = LogManager.getLogger("LabTracker");
+	private static final Logger logger = LogManager.getLogger("LabTracker");
 	
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 		
@@ -32,7 +32,7 @@ public class LabTracker {
 		propManager.loadProps();
 		
 		logger.trace("Setting Error Properties");
-		errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");		
+		errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");	
 		error.setErrorFileOutputPath(errorFileOutputPath);
 				
 		// Check for Error File, if exists error out of program

@@ -4,15 +4,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
 
-import main.LabTracker;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 public class Error {
 	
 	private static Error errorInstance;
 	private static String errorFileOutputPath;
-	private static HashMap<String, String> minorErrors = new HashMap<String, String>();
+	
+	// Logger
+	private static final Logger logger = LogManager.getLogger("LabTracker");
 	
     private Error() {
     }
@@ -30,16 +32,6 @@ public class Error {
 	
 	public String getErrorFileOutputPath() {
 		return errorFileOutputPath;
-	}
-	
-	// Store minor error
-	public void MinorError(String className, String errorInfo){
-		Error.minorErrors.put(className, errorInfo);
-	}
-	
-	// Log out all minor errors at end of program
-	public void logMinorErrors(){
-		
 	}
 	
 	// Terminate due to Fatal Error
@@ -70,8 +62,8 @@ public class Error {
 		File errorFile = new File(errorFileOutputPath);
 		// Check for existence of error file
 		if (errorFile.exists()) {
-			String errorInfo = "LabTracker terminating, Error File detected! Resolve error and remove file to continue with next run!";
-			LabTracker.logger.fatal(errorInfo);
+			String errorInfo = "LabTracker terminating, Error File detected! Check logs to resolve error and remove file to continue with next run!";
+			logger.fatal(errorInfo);
 			errorInstance.fatalError(errorInfo);
 		}
 	}

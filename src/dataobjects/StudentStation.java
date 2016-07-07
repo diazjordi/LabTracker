@@ -1,4 +1,4 @@
-package stations;
+package dataobjects;
 
 import java.io.Serializable;
 import java.util.regex.Matcher;
