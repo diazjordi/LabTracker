@@ -10,16 +10,17 @@ public class Lab {
 	private int inUse;
 	private int avail;
 	private int offline;
+	private int suppressed;
 	private int total;
-	
+
 	public Lab() {
 		super();
 	}
-	
-	public Lab(String labName){
+
+	public Lab(String labName) {
 		this.labName = labName;
 	}
-	
+
 	public String getLabName() {
 		return labName;
 	}
@@ -43,12 +44,11 @@ public class Lab {
 	public void setStations(ArrayList<StudentStation> stations) {
 		this.stations = stations;
 	}
-	
-	public void addStation(StudentStation station){
+
+	public void addStation(StudentStation station) {
 		this.stations.add(station);
 	}
 
-	
 	public int getInUse() {
 		return inUse;
 	}
@@ -71,33 +71,37 @@ public class Lab {
 
 	public void setOffline(int offline) {
 		this.offline = offline;
+	}	
+
+	public int getSuppressed() {
+		return suppressed;
+	}
+
+	public void setSuppressed(int suppressed) {
+		this.suppressed = suppressed;
 	}
 
 	public int getTotal() {
 		return total;
 	}
 
-	public void setTotalInternal(int total) {
+	public void setTotalInternally() {
 		total = inUse + avail + offline;
 	}
-	
-	public void setTotal(int total){
+
+	public void setTotal(int total) {
 		this.total = total;
 	}
 
 	@Override
 	public String toString() {
-		String lab = "Lab Name: " + labName + "/n" +
-				"HTML: " + "/n" + scrapedHTML + "/n" +
-				"In Use: " + inUse + "/n" +
-				"Available: " + avail + "/n" +
-				"Offline: " + offline + "/n" +
-				"Total: " + total + "/n";
-		
+		String lab = "Lab Name: " + labName + "\n" + "HTML: " + "\n"
+				+ scrapedHTML.length() + "\n" + "In Use: " + inUse + "\n"
+				+ "Available: " + avail + "\n" + "Offline: " + offline + "\n"
+				+ "Suppressed: " + suppressed + "\n"
+				+ "Total: " + total + "\n";
+
 		return lab;
 	}
-	
-	
-	
 
 }

@@ -16,8 +16,8 @@ public class StudentStation implements Serializable {
 	private String stationNameShort;
 	private String stationID;
 	private String stationStatus;
-	private String os;// currently unused
-
+	private String os;
+	
 	public StudentStation(String stationNameIn, String stationIDIn,
 			String stationStatusIn) {
 		this.stationName = stationNameIn;
@@ -34,7 +34,7 @@ public class StudentStation implements Serializable {
 		this.stationStatus = stationStatusIn;
 		this.os = osIN;
 	}
-	
+
 	public String getStationNameShort() {
 		return stationNameShort;
 	}
@@ -51,11 +51,11 @@ public class StudentStation implements Serializable {
 	public void setStationName(String stationNameIN) {
 		this.stationName = stationNameIN;
 	}
-	
+
 	public String getStationID() {
 		return stationID;
 	}
-	
+
 	public void setStationID(String stationIDIN) {
 		this.stationID = stationIDIN;
 	}
@@ -63,7 +63,7 @@ public class StudentStation implements Serializable {
 	public String getStationStatus() {
 		return stationStatus;
 	}
-	
+
 	public void setStationStatus(String stationStatusIN) {
 		this.stationStatus = stationStatusIN;
 	}
@@ -75,12 +75,13 @@ public class StudentStation implements Serializable {
 	public void setStationOS(String osIN) {
 		this.os = osIN;
 	}
-	
-	private String parseStationNameShort(String stationName){
+
+	private String parseStationNameShort(String stationName) {
 		String name;
 		Pattern pat = Pattern.compile("(?<=ec-\\w)(\\w*)(?=-ln)");// old pattern
 		Matcher mat = pat.matcher(stationName);
-		Pattern pat2 = Pattern.compile("(?<=\\w{2}-\\w{6}-\\w)(\\w*)");// new pattern
+		Pattern pat2 = Pattern.compile("(?<=\\w{2}-\\w{6}-\\w)(\\w*)");// new
+																		// pattern
 		Matcher mat2 = pat2.matcher(stationName);
 		if (mat.find()) {
 			name = mat.group().toString();
@@ -91,11 +92,12 @@ public class StudentStation implements Serializable {
 		}
 		return name;
 	}
+
 	@Override
 	public String toString() {
 		String result = " Station Name:    " + stationName + "\n"
-				      + " Station ID:      " + stationID + "\n" 
-				      + " Station Status:  " + stationStatus + "\n";
+				+ " Station ID:      " + stationID + "\n"
+				+ " Station Status:  " + stationStatus + "\n";
 		return result;
 	}
 }

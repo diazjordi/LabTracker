@@ -1,6 +1,5 @@
 package retrieval;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
@@ -9,7 +8,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -34,51 +32,48 @@ public class HTMLScraper {
 	private Lab currentLab = new Lab();
 	private int threadSleep;
 	private int numberOfAttempts;
-	private String scraperOutputPath = null;
+	//private String scraperOutputPath = null; // no longer saving to file
 	private Boolean scrapeSuccess = false;
 	private String scrapedHTML = null;
 	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
 	private static final Logger logger = LogManager.getLogger("LabTracker");
-	
+
 	public void run() throws IOException, SQLException, InterruptedException {
-		logger.trace("*-----HTMLScraper Is Starting!-----*");
 		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
-		// Get props
+		
 		this.scraperProperties = propManager.getScraperProperties();
-		// Set props
+		
 		this.labURLs = propManager.getLabURLs();
 		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
 		this.numberOfAttempts = Integer.parseInt(scraperProperties.get("scraperNumberOfAttempts"));
-		this.scraperOutputPath = scraperProperties.get("scraperOutputPath");//Add Lab Name as part of path
+		//this.scraperOutputPath = scraperProperties.get("scraperOutputPath");  // no longer saving to file
+		
 		logger.trace("Properties Set, Starting Scraping Process!");
-		// Run Parent Method to Control scraping
 		iterateURLsAndScrape();
 	}
-	
+
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {
 		Iterator<Entry<String, String>> it = labURLs.entrySet().iterator();
 		while (it.hasNext()) {
+			logger.trace("*-----HTMLScraper Is Starting!-----*");
 			Map.Entry<String, String> pair = (Map.Entry<String, String>) it.next();
 			scrapeSuccess = false;
 			logger.trace("Attempting To Scrape " + pair.getValue());
-			getHtmlFromPage(pair.getValue());
 			currentLab.setLabName(pair.getKey());
+			getHtmlFromPage(pair.getValue());
 			currentLab.setScrapedHTML(scrapedHTML);
-			System.out.println(currentLab.toString());
 			if (scrapeSuccess) {
 				logger.trace("Scrape Successful, Commencing Parsing");
 				HTMLParser parser = new HTMLParser();
 				parser.run(currentLab);
 			}
 		}
-		logger.trace("LabTracker has completed process, shutting down!!");
 	}
 
 	// Takes URL for map page, loads map page into memory
-	// searches for status div "the-pieces" and saves relevant html locally
-	// for parsing
+	// searches for status div "the-pieces" and saves relevant html to lab object
 	private void getHtmlFromPage(String url) throws IOException, InterruptedException {
 		String htmlString;
 		// To keep track of whether loads are successful
@@ -112,16 +107,12 @@ public class HTMLScraper {
 					Thread.sleep(threadSleep);
 					// Check page for requested div
 					if (mapPage.getElementById("the-pieces") != null) {
-						// Create file to save HTML
-						File scrapedHTMLFile = new File(scraperOutputPath + currentLab.getLabName());
 						// Create string from requested html div
-						htmlString = mapPage.getElementById("the-pieces").asXml();
-						// Write to file
-						FileUtils.writeStringToFile(scrapedHTMLFile, htmlString);
+						htmlString = mapPage.getElementById("the-pieces").asXml();					
 						// Update Boolean
 						divLoaded = true;
 						// Log out successful scrape
-						logger.trace(url + " contained requested HTML, successfully scraped and written to local file!");
+						logger.trace(url + " contained requested HTML, saved scraped HTML to Lab object!");
 						scrapeSuccess = true;
 						scrapedHTML = htmlString;
 						break;

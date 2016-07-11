@@ -1,23 +1,25 @@
 package retrieval;
 
 import java.io.*;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dataobjects.Lab;
-import dataobjects.StudentStation;
-import error.Error;
+import main.LabTracker;
 
-import org.apache.log4j.*;
-import org.jsoup.*;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import output.DBConnector;
 import output.HTMLCreator;
 import setup.PropertyManager;
+import dataobjects.Lab;
+import dataobjects.StudentStation;
+import error.Error;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Need to implement ability to read multiple
@@ -25,101 +27,91 @@ import setup.PropertyManager;
  * file or DB.
  */
 public class HTMLParser {
-	
-	private Lab currentLab = new Lab();
-	
-	// Parser properties
+
+	private Lab currentLab;
+
 	private Map<String, String> parserProperties = new HashMap<String, String>();
 	private Map<String, String> suppressionProperties = new HashMap<String, String>();
 
-	// Error File property
-	private Map<String, String> errorProperties = new HashMap<String, String>();
-
-	// Path to retrieve HTML for parsing
 	private String parserInputPath = null;
 	private String parserOutputPath = null;
 	private String parserSuppressionFilePath = null;
-	
-	// Data Threshold
+
 	private Integer parserReportingThreshold = 0;
 
-	// Vars to track units
 	private Integer numUnits = 0;
 	private Integer numInUse = 0;
 	private Integer numAvail = 0;
-	private Integer numNoStatus = 0;
 	private Integer numOffline = 0;
 
-	// Vars to hold HTML divs
 	private Elements stationNameDivs;
 	private Elements statusDivs;
-	private Elements osImageDivs; // currently unused
+	private Elements osImageDivs;
 
-	// ArrayList to hold parsed and created stations
-	private ArrayList<StudentStation> stuStations = new ArrayList<StudentStation>();
+	private ArrayList<StudentStation> stations = new ArrayList<StudentStation>();
 
-	// Count variables
 	private String avail;
 	private String inUse;
 	private String off;
 
-	// Error Handling
 	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
-	// Data Output Classes
 	private DBConnector dbConnector = new DBConnector();
 	private HTMLCreator htmlCreator = new HTMLCreator();
 
-	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
 
 	public void run(Lab currentLab) throws IOException, SQLException {
 		logger.trace("*-----HTMLParser Is Starting!-----*");
 		this.currentLab = currentLab;
-		// Set props
+		
 		logger.trace("Retrieving Parser Properties");
 		getProps();
-		// parse HTML for needed fields/divs
+		
 		logger.trace("Parsing HTML For Requested Data");
 		parseHTML();
-		// parse retrieved divs for data, create station stations and place in
-		// data structure, check for data errors
+		
 		logger.trace("Creating Station Objects");
 		createStationObjects();
 		setCountVariables();
-		// Update suppressed stations
+		
 		logger.trace("Setting Suppressed Stations");
-		setSuppressedStations(stuStations, suppressionProperties);
-		// Check % Offline, if above threshold error out
+		setSuppressedStations();
+		
+		LabTracker.addLab(currentLab);
+		
 		logger.trace("Checking Error Reporting Threshold");
 		detectDataErrors();
-		// Write to HTML Map Page
-		logger.trace("Updating HTML Map Page");
-		// writeMapOfStationsToHTML(stuStations);
-		htmlCreator.writeMapOfStationsToHTML(stuStations, avail, inUse, off);
-		// Write to DB
+		
+		logger.trace("Creating HTML Map Page");
+		//htmlCreator.writeMapOfStationsToHTML(stations, avail, inUse, off);
+		
 		logger.trace("Writing Data To MYSQL DB");
-		dbConnector.writeObjectsToTable(stuStations, avail, inUse, off);
-		dbConnector.writeRunStatusToTable(avail, inUse, off);
-		// Write out objects to local file
-		logger.trace("Writing Objects To Local Serialized File");
-		writeObjectsToFile(stuStations);
+		dbConnector.writeToLabTable(currentLab);
+		//dbConnector.writeObjectsToTable(stations, avail, inUse, off);
+		//dbConnector.writeRunStatusToTable(avail, inUse, off);
 	}
 
-	// Get properties from prop files
 	private void getProps() throws IOException {
-		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
+		PropertyManager propManager = PropertyManager
+				.getPropertyManagerInstance();
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
-		this.parserInputPath = parserProperties.get("parserInputPath") + currentLab.getLabName();//Add Lab Name as part of path
-		this.parserOutputPath = parserProperties.get("parserOutputPath") + currentLab.getLabName();//Add Lab Name as part of path
-		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
-		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
+		this.parserInputPath = parserProperties.get("parserInputPath")
+				+ currentLab.getLabName();
+		this.parserOutputPath = parserProperties.get("parserOutputPath")
+				+ currentLab.getLabName();
+		this.parserSuppressionFilePath = parserProperties
+				.get("parserSuppressionFilePath");
+		this.parserReportingThreshold = Integer.parseInt(parserProperties
+				.get("parserReportingThreshold"));
 		logger.trace("Parser Input File Path:        " + parserInputPath);
 		logger.trace("Parser Local Output File Path: " + parserOutputPath);
-		logger.trace("Supression File Path:          " + parserSuppressionFilePath);
-		logger.trace("Parser Reporting Threshold:    " + parserReportingThreshold + "%");
+		logger.trace("Supression File Path:          "
+				+ parserSuppressionFilePath);
+		logger.trace("Parser Reporting Threshold:    "
+				+ parserReportingThreshold + "%");
 	}
 
 	/**
@@ -129,11 +121,9 @@ public class HTMLParser {
 	 */
 	private void parseHTML() throws IOException {
 		/**
-		 * Load HTML pulled from page into File then load file into Document
-		 * for parsing
+		 * Load HTML pulled from page into File then load file into Document for
+		 * parsing
 		 */
-		//File input = new File(parserInputPath);
-		//Document doc = Jsoup.parse(input, "UTF-8", "");
 		Document doc = Jsoup.parse(currentLab.getScrapedHTML());
 		// Create elements out of relevant HTML divs
 		stationNameDivs = doc.getElementsByClass("station-label");
@@ -150,21 +140,18 @@ public class HTMLParser {
 	private void createStationObjects() {
 		// Iterates through divs containing station ID info
 		for (int k = 0; k < stationNameDivs.size(); k++) {
-			// Retrieves each station name from station name divs
 			String stationName = stationNameDivs.get(k).text();
-			// Retrieves each station ID from status divs
 			String stationID = statusDivs.get(k).id();
-			// Retrieves each station status
 			String status = getStationStatus(statusDivs.get(k).toString());
-			// Create stations.StudentStation object with extracted data and add
-			// station to ArrayList
-			StudentStation stu1 = new StudentStation(stationName, stationID,status);
-			stuStations.add(k, stu1);
+			String OS = osImageDivs.get(k).toString();			
+			StudentStation stu1 = new StudentStation(stationName, stationID, status, OS);
+			stations.add(k, stu1);
 		}
+		currentLab.setStations(stations);
 	}
 
 	private void setCountVariables() {
-		for (StudentStation station : stuStations) {
+		for (StudentStation station : stations) {
 			if (station.getStationStatus().matches("Available")) {
 				numAvail++;
 			} else if (station.getStationStatus().matches("InUse")) {
@@ -173,18 +160,17 @@ public class HTMLParser {
 				numOffline++;
 			}
 		}
-		numUnits = numAvail + numInUse + numOffline;
+		currentLab.setInUse(numInUse);
+		currentLab.setAvail(numAvail);
+		currentLab.setOffline(numOffline);
+		currentLab.setTotalInternally();
 		logger.trace("Total Number of Units: " + numUnits);
 		logger.trace("Number of Available: " + numAvail);
 		logger.trace("Number of In Use: " + numInUse);
-		logger.trace("Number of No Status: " + numOffline);
-		float numUnits1 = numUnits;
-		float numAvail1 = numAvail;
-		float numInUse1 = numInUse;
-		float numOffline1 = numOffline;
-		float percentAvail = (numAvail1 / numUnits1) * 100;
-		float percentInUse = (numInUse1 / numUnits1) * 100;
-		float percentOffline = (numOffline1 / numUnits1) * 100;
+		logger.trace("Number of Offline: " + numOffline);
+		float percentAvail = (float) (numAvail / numUnits) * 100;
+		float percentInUse = (float) (numInUse / numUnits) * 100;
+		float percentOffline = (float) (numOffline / numUnits) * 100;
 		int percAvail = (int) percentAvail;
 		int percInUse = (int) percentInUse;
 		int percOffline = (int) percentOffline;
@@ -198,24 +184,24 @@ public class HTMLParser {
 		logger.trace(inUse);
 		logger.trace(off);
 	}
-	
+
 	private void detectDataErrors() {
-		// check if num of stations offline/ not reporting is above acceptable threshold
+		// check if num of stations offline/ not reporting is above acceptable
+		// threshold
 		double percentThreshold = (double) parserReportingThreshold / 100;
 		double percentOffline = (double) numOffline / numUnits;
-		if (percentOffline >= percentThreshold ){
+		if (percentOffline >= percentThreshold) {
 			errorInfo = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
 			logger.error(error);
 			error.fatalError(errorInfo);
-		}		
+		}
 		// check for zero data error
-		if(numAvail == 0 && numInUse == 0 && numOffline == 0){
+		if (numAvail == 0 && numInUse == 0 && numOffline == 0) {
 			logger.trace("Detected zero data error, will continue with next scheduled");
 			logger.trace("run but will denote error in DB RunStatus.");
 		}
 	}
 
-	// Extracts station status from HTML div class="station"
 	private String getStationStatus(String statusDiv) {
 		Pattern pat = Pattern.compile("(?<=Computer-01-)(\\w*)(?=\\.png)");
 		Matcher mat = pat.matcher(statusDiv);
@@ -228,39 +214,25 @@ public class HTMLParser {
 				stationStatus = "Available";
 			}
 		} else {
-			stationStatus = "NoStatusAvailable";
+			stationStatus = "Offline";
 		}
 		return stationStatus;
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void setSuppressedStations(ArrayList<StudentStation> stuStations,
-			Map<String, String> suppressionProperties) {
-		for (int i = 0; i < stuStations.size(); i++) {
-			Iterator it = suppressionProperties.entrySet().iterator();
+	private void setSuppressedStations() {
+		int numSup = 0;
+		for (int i = 0; i < stations.size(); i++) {
+			Iterator<?> it = suppressionProperties.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry pair = (Map.Entry) it.next();
-				if (stuStations.get(i).getStationName().matches(pair.getValue().toString())) {
-					stuStations.get(i).setStationStatus("Suppressed");
+				if (stations.get(i).getStationName().matches(pair.getValue().toString())) {
+					stations.get(i).setStationStatus("Suppressed");
+					numSup += 1;
 				}
 			}
 		}
-	}
-
-	// Writes station objects to serialized file
-	private void writeObjectsToFile(ArrayList<StudentStation> stuStations)
-			throws IOException {
-		try {
-			File output = new File(parserOutputPath);
-			ObjectOutputStream listOutputStream = new ObjectOutputStream(new FileOutputStream(output));
-			for (int i = 0; i < stuStations.size(); i++) {
-				listOutputStream.writeObject(stuStations.get(i).toString());
-			}
-			listOutputStream.flush();
-			listOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		currentLab.setSuppressed(numSup);
 	}
 
 }
