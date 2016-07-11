@@ -82,6 +82,9 @@ public class Lab {
 	}
 
 	public int getTotal() {
+		if(total == 0){
+			setTotalInternally();
+		}
 		return total;
 	}
 

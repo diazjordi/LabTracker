@@ -71,7 +71,7 @@ public class DBConnector {
 	}
 	
 	// Write To Lab Specific Table
-	public void writeToLabTable(Lab currentLab){
+	public void writeToLabTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Lab Specific Table!-----*");
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
@@ -92,93 +92,59 @@ public class DBConnector {
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
+		con.close();
 	}
 	
 	//writeToRunStatusTable
-	public void writeToRunStatusTable(Lab currentLab){
+	public void writeToRunStatusTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Run Status Table!-----*");
 		try {
-			
-			}
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}		
-	}
-	
-	//writeToFlatTable
-	
-	
-	
-	
-	
-	// Writes station objects data to MySQL DB
-	// table: allstationsv1
-	// fields: StationName, StationID, StationStatus, OS, DATE
-	public void writeObjectsToTable(ArrayList<StudentStation> stuStations,
-			String avail, String inUse, String off) throws IOException,
-			SQLException {
-		logger.trace("*-----DBConnector is Writing Station Data to Table!-----*");
-		// Initiate properties before run
-		getProps();
-		// Iterate through ArrayList of student stations and write out to table
-		// for use by Node.js or Apache front end
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			logger.error("MySQL JDBC Driver Not Found!");
-			error.fatalError(e.toString());
-			e.printStackTrace();
-			return;
-		}
-		// Initiate DB connection
-		Connection con = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/" + database, username, password);
-		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			for (StudentStation station : stuStations) {
-				String query = "INSERT INTO "
-						+ flatTable
-						+ " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-						+ " VALUES ('" + station.getStationNameShort() + "','"
-						+ station.getStationName() + "','"
-						+ station.getStationID() + "','"
-						+ station.getStationStatus() + "','"
-						+ station.getStationOS() + "', NOW())";
+			String query = "INSERT INTO "
+					+ "RunStatus"
+					+ " (Lab, TotalUnits, Available, InUse, Offline, Suppressed, Date) "
+					+ " VALUES ('" 
+					+ currentLab.getLabName().toUpperCase()	+ "','" 
+					+ currentLab.getTotal() + "','"
+					+ currentLab.getAvail() + "','" 
+					+ currentLab.getInUse()	+ "','" 
+					+ currentLab.getOffline() + "','"
+					+ currentLab.getSuppressed() + "'," 
+					+ " NOW())";
 				logger.trace(query);
-				stmt.executeUpdate(query);
-			}
+				stmt.executeUpdate(query);			
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
 		con.close();
 	}
-
-	public void writeRunStatusToTable(String avail, String inUse, String off)
-			throws IOException, SQLException {
-		logger.trace("*-----DBConnector is Writing RunStatus Data to Table!-----*");
-		// Initiate properties before run
-		getProps();
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			logger.error("MySQL JDBC Driver Not Found!");
-			error.fatalError(e.toString());
-			return;
-		}
-		// Initiate DB connection
-		Connection con = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/" + database, username, password);
+	
+	/*
+	//writeToFlatTable
+	public void writeToFlatTable(ArrayList<Lab> labs) throws SQLException{
+		String mainQuery;
+		logger.trace("*-----DBConnector is Writing to Flat Table!-----*");
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			String logQuery = "INSERT INTO "
-					+ flatTable
-					+ " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-					+ " VALUES ('" + avail + "','" + inUse + "','" + off
-					+ "','RunStatus','" + null + "', NOW())";
-			logger.trace(logQuery);
-			stmt.executeUpdate(logQuery);
+			String query = "INSERT INTO "
+					+ "RunStatus"
+					+ " (Lab, TotalUnits, Available, InUse, Offline, Suppressed, Date) "
+					+ " VALUES ('" 
+					+ currentLab.getLabName().toUpperCase()	+ "','" 
+					+ currentLab.getTotal() + "','"
+					+ currentLab.getAvail() + "','" 
+					+ currentLab.getInUse()	+ "','" 
+					+ currentLab.getOffline() + "','"
+					+ currentLab.getSuppressed() + "'," 
+					+ " NOW())";
+				logger.trace(query);
+				stmt.executeUpdate(query);			
 		} catch (SQLException ex) {
+			ex.printStackTrace();
 		}
 		con.close();
 	}
+	*/
+	
+
 }
