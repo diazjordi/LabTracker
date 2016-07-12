@@ -5,4 +5,4 @@ Using HTMLUnit and JSOUP. Then can output resulting info as objects to DB or loc
 Major code refactor and program restructoring in the works!
 Will be implementing new features and DB schema.
 
-(Updated 12-14-15)
+(Updated 07-11-16)
