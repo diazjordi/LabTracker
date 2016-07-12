@@ -11,109 +11,169 @@ import java.util.Map;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import main.LabTracker;
 import setup.PropertyManager;
-import stations.StudentStation;
 
 import com.mysql.jdbc.Statement;
 
-import errors.FatalError;
+import dataobjects.Lab;
+import dataobjects.StudentStation;
+import error.Error;
 
+@SuppressWarnings("unused")
 public class DBConnector {
-
-	// Database properties
+	
+	private Connection con;
+	
 	private Map<String, String> databaseProperties = new HashMap<String, String>();
 
-	// Database
 	private String database;
-	private String table;
+	private String flatTable;
 	private String username;
 	private String password;
 
-	// Logger
-	private static final Logger logger = LogManager.getLogger("LabTracker");
+	private static Error error = Error.getErrorInstance();
+	private static String errorInfo;
 
-	// Get properties from prop files
+	private static final Logger logger = LogManager.getLogger("LabTracker");
+	
+	
+	public DBConnector(){
+		try {
+			getProps();
+			createConnection();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e);
+		}	
+	}
+	
 	private void getProps() throws IOException {
-		PropertyManager propManager = new PropertyManager();
-		// Get props
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		this.databaseProperties = propManager.getDatabaseProperties();
-		// Retrieve DB properties
+		
 		this.database = databaseProperties.get("db");
-		this.table = databaseProperties.get("db.table");
+		this.flatTable = databaseProperties.get("db.flattable");
 		this.username = databaseProperties.get("db.username");
 		this.password = databaseProperties.get("db.password");
-		// Eventually log all of these out
-		logger.trace("Database: " + database);
-		logger.trace("Table: " + table);
-		logger.trace("Username: " + username);
-		logger.trace("Password: " + password);
 	}
-
-	// Writes station objects data to MySQL DB
-	// table: allstationsv1
-	// fields: StationName, StationID, StationStatus, OS, DATE
-	public void writeObjectsToTable(ArrayList<StudentStation> stuStations, String avail, String inUse, String off) throws IOException, SQLException {
-		logger.trace("*-----DBConnector is Writing Station Data to Table!-----*");
-		// Initiate properties before run
-		getProps();
-		// Iterate through ArrayList of student stations and write out to table
-		// for use by Node.js or Apache front end
+	
+	private void createConnection(){
+		logger.trace("*-----DBConnector is Creating DB Connection!-----*");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			logger.error("MySQL JDBC Driver Not Found!");
-			FatalError.fatalErrorEncountered(e.toString());
+			this.con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + database, username, password);
+		} catch (SQLException e) {
 			e.printStackTrace();
-			return;
+			logger.error(e);
+			error.fatalError(e.toString());			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			logger.error(e);
+			error.fatalError(e.toString());	
 		}
-		// Initiate DB connection
-		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + database, username, password);
+	}
+	
+	public void closeConnection(){
+		logger.trace("*-----DBConnector is Closing DB Connection!-----*");
+		try {
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			logger.error(e);
+		}
+	}
+	
+	// Write To Lab Specific Table
+	public void writeToLabTable(Lab currentLab) throws SQLException{
+		logger.trace("*-----DBConnector is Writing to Lab Specific Table!-----*");
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			for (StudentStation station : stuStations) {
+			for (StudentStation station : currentLab.getStations()) {
 				String query = "INSERT INTO "
-						+ table
-						+ " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-						+ " VALUES ('" + station.getStationNameShort() + "','"
-						+ station.getStationName() + "','"
-						+ station.getStationID() + "','"
-						+ station.getStationStatus() + "','"
-						+ station.getStationOS() + "', NOW())";
+						+ currentLab.getLabName()
+						+ " (StationName, StationStatus, StationNameShort, StationID, OS, DATE) "
+						+ " VALUES ('" 
+						+ station.getStationName().toUpperCase() + "','"
+						+ station.getStationStatus().toUpperCase() + "','"
+						+ station.getStationNameShort().toUpperCase() + "','"
+						+ station.getStationID().toUpperCase() + "','"
+						+ "NULL" //station.getStationOS() 
+						+ "', NOW())";
 				logger.trace(query);
 				stmt.executeUpdate(query);
 			}
 		} catch (SQLException ex) {
 			ex.printStackTrace();
+			logger.error(ex);
 		}
-		con.close();
 	}
-
-	public void writeRunStatusToTable(String avail, String inUse, String off)
-			throws IOException, SQLException {
-		logger.trace("*-----DBConnector is Writing RunStatus Data to Table!-----*");
-		// Initiate properties before run
-		getProps();
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			logger.error("MySQL JDBC Driver Not Found!");
-			FatalError.fatalErrorEncountered(e.toString());
-			return;
-		}
-		// Initiate DB connection
-		Connection con = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/" + database, username, password);
+	
+	// Write To Run Status Table
+	public void writeToRunStatusTable(Lab currentLab) throws SQLException{
+		logger.trace("*-----DBConnector is Writing to Run Status Table!-----*");
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			String logQuery = "INSERT INTO "
-					+ table
-					+ " (StationNameShort, StationName, StationID, StationStatus, OS, DATE) "
-					+ " VALUES ('" + avail + "','" + inUse + "','" + off
-					+ "','RunStatus','" + null + "', NOW())";
-			logger.trace(logQuery);
-			stmt.executeUpdate(logQuery);
+			String query = "INSERT INTO "
+					+ "RunStatus"
+					+ " (Lab, TotalUnits, Available, InUse, Offline, Suppressed, Date) "
+					+ " VALUES ('" 
+					+ currentLab.getLabName().toUpperCase()	+ "','" 
+					+ currentLab.getTotal() + "','"
+					+ currentLab.getAvail() + "','" 
+					+ currentLab.getInUse()	+ "','" 
+					+ currentLab.getOffline() + "','"
+					+ currentLab.getSuppressed() + "'," 
+					+ " NOW())";
+				logger.trace(query);
+				stmt.executeUpdate(query);			
 		} catch (SQLException ex) {
+			ex.printStackTrace();
+			logger.error(ex);
 		}
-		con.close();
 	}
+
+	// Write To Flat Table 
+	public void writeToFlatTable(Lab lab) throws SQLException{
+		logger.trace("*-----DBConnector is Writing to Flat Table!-----*");
+		
+		StringBuilder completeQuery = new StringBuilder();
+		String firstBit = "INSERT INTO FLAT (DATE, LAB, AVAILABLE, INUSE, OFFLINE, SUPPRESSED, TOTAL, DATA) VALUES (";
+		completeQuery.append(firstBit);
+		
+		try {
+			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
+			String secondBit =  "NOW()" + ",'" 
+						        + lab.getLabName().toUpperCase() + "',"
+							    + lab.getAvail() + ","
+							    + lab.getInUse() + ","
+							    + lab.getOffline() + ","
+							    + lab.getSuppressed() + ","
+							    + lab.getTotal() + ","
+							    + "'(";
+			completeQuery.append(secondBit);
+			// iterate stations
+			for (int j = 0 ; j < lab.getTotal() ; j++){
+				String station = lab.getStations().get(j).getStatusCode();
+				if(j != lab.getTotal()-1){
+					completeQuery.append(station +",");
+				}
+				else if(j == lab.getTotal()-1){
+					completeQuery.append(station + ")')");
+				}					
+			}
+			logger.trace(completeQuery);
+			String query = completeQuery.toString();
+			stmt.executeUpdate(query);	
+			
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			logger.error(ex);
+		}
+	}
+
+	
+	
+	
+
 }
