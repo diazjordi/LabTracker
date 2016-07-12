@@ -18,8 +18,7 @@ import error.Error;
 public class LabTracker {
 
 	// Singleton PropertyManager
-	private static PropertyManager propManager = PropertyManager
-			.getPropertyManagerInstance();
+	private static PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 
 	// Singleton Error Handling
 	private static Error error = Error.getErrorInstance();

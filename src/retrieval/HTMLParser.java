@@ -33,13 +33,10 @@ public class HTMLParser {
 	private Map<String, String> parserProperties = new HashMap<String, String>();
 	private Map<String, String> suppressionProperties = new HashMap<String, String>();
 
-	private String parserInputPath = null;
-	private String parserOutputPath = null;
 	private String parserSuppressionFilePath = null;
-
 	private Integer parserReportingThreshold = 0;
 
-	private Integer numUnits = 0;
+	//private Integer numUnits = 0;
 	private Integer numInUse = 0;
 	private Integer numAvail = 0;
 	private Integer numOffline = 0;
@@ -49,11 +46,7 @@ public class HTMLParser {
 	private Elements osImageDivs;
 
 	private ArrayList<StudentStation> stations = new ArrayList<StudentStation>();
-
-	private String avail;
-	private String inUse;
-	private String off;
-
+	
 	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
@@ -85,13 +78,16 @@ public class HTMLParser {
 		detectDataErrors();
 		
 		logger.trace("Creating HTML Map Page");
-		//htmlCreator.writeMapOfStationsToHTML(stations, avail, inUse, off);
+		htmlCreator.setLab(currentLab);
+		htmlCreator.getProps();
+		//htmlCreator.writeMapOfStationsToHTML();
 		
-		logger.trace("Writing Data To MYSQL DB");
-		dbConnector.writeToLabTable(currentLab);
-		dbConnector.writeToRunStatusTable(currentLab);
-		dbConnector.writeToFlatTable(currentLab);
-		dbConnector.closeConnection();
+		logger.trace("Writing Data To MySQL DB");
+		//dbConnector.createConnection();
+		//dbConnector.writeToLabTable(currentLab);
+		//dbConnector.writeToRunStatusTable(currentLab);
+		//dbConnector.writeToFlatTable(currentLab);
+		//dbConnector.closeConnection();
 	}
 
 	private void getProps() throws IOException {
@@ -99,16 +95,8 @@ public class HTMLParser {
 				.getPropertyManagerInstance();
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
-		this.parserInputPath = parserProperties.get("parserInputPath")
-				+ currentLab.getLabName();
-		this.parserOutputPath = parserProperties.get("parserOutputPath")
-				+ currentLab.getLabName();
-		this.parserSuppressionFilePath = parserProperties
-				.get("parserSuppressionFilePath");
-		this.parserReportingThreshold = Integer.parseInt(parserProperties
-				.get("parserReportingThreshold"));
-		logger.trace("Parser Input File Path:        " + parserInputPath);
-		logger.trace("Parser Local Output File Path: " + parserOutputPath);
+		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
+		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
 		logger.trace("Supression File Path:          "
 				+ parserSuppressionFilePath);
 		logger.trace("Parser Reporting Threshold:    "
@@ -130,7 +118,6 @@ public class HTMLParser {
 		stationNameDivs = doc.getElementsByClass("station-label");
 		statusDivs = doc.getElementsByClass("station");
 		osImageDivs = doc.getElementsByClass("os-image");
-		numUnits = stationNameDivs.size();
 	}
 
 	/**
@@ -165,32 +152,17 @@ public class HTMLParser {
 		currentLab.setAvail(numAvail);
 		currentLab.setOffline(numOffline);
 		currentLab.setTotalInternally();
-		logger.trace("Total Number of Units: " + numUnits);
-		logger.trace("Number of Available: " + numAvail);
-		logger.trace("Number of In Use: " + numInUse);
-		logger.trace("Number of Offline: " + numOffline);
-		float percentAvail = (float) (numAvail / numUnits) * 100;
-		float percentInUse = (float) (numInUse / numUnits) * 100;
-		float percentOffline = (float) (numOffline / numUnits) * 100;
-		int percAvail = (int) percentAvail;
-		int percInUse = (int) percentInUse;
-		int percOffline = (int) percentOffline;
-		avail = "(Available - " + numAvail + ", " + numUnits + ", " + percAvail
-				+ "%)";
-		inUse = "(In Use    - " + numInUse + ", " + numUnits + ", " + percInUse
-				+ "%)";
-		off = "(Offline   - " + numOffline + ", " + numUnits + ", "
-				+ percOffline + "%)";
-		logger.trace(avail);
-		logger.trace(inUse);
-		logger.trace(off);
+		logger.trace("Number of Available: "   + numAvail);
+		logger.trace("Number of In Use: "      + numInUse);
+		logger.trace("Number of Offline: "     + numOffline);
+		logger.trace("Total Number of Units: " + currentLab.getTotal());
 	}
 
 	private void detectDataErrors() {
 		// check if num of stations offline/ not reporting is above acceptable
 		// threshold
 		double percentThreshold = (double) parserReportingThreshold / 100;
-		double percentOffline = (double) numOffline / numUnits;
+		double percentOffline = (double) numOffline / currentLab.getTotal();
 		if (percentOffline >= percentThreshold) {
 			errorInfo = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
 			logger.error(error);

@@ -41,7 +41,6 @@ public class DBConnector {
 	public DBConnector(){
 		try {
 			getProps();
-			createConnection();
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
@@ -58,7 +57,7 @@ public class DBConnector {
 		this.password = databaseProperties.get("db.password");
 	}
 	
-	private void createConnection(){
+	public void createConnection(){
 		logger.trace("*-----DBConnector is Creating DB Connection!-----*");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
