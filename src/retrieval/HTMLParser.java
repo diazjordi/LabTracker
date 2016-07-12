@@ -90,6 +90,8 @@ public class HTMLParser {
 		logger.trace("Writing Data To MYSQL DB");
 		dbConnector.writeToLabTable(currentLab);
 		dbConnector.writeToRunStatusTable(currentLab);
+		dbConnector.writeToFlatTable(currentLab);
+		dbConnector.closeConnection();
 	}
 
 	private void getProps() throws IOException {

@@ -17,6 +17,7 @@ public class StudentStation implements Serializable {
 	private String stationID;
 	private String stationStatus;
 	private String os;
+	private String statusCode;
 	
 	public StudentStation(String stationNameIn, String stationIDIn,
 			String stationStatusIn) {
@@ -75,6 +76,26 @@ public class StudentStation implements Serializable {
 	public void setStationOS(String osIN) {
 		this.os = osIN;
 	}
+	
+	public String getStatusCode(){
+		if(stationStatus.matches("Available")){
+			statusCode = "A";
+		}
+		else if(stationStatus.matches("InUse")){
+			statusCode = "I";
+		}
+		else if(stationStatus.matches("Offline")){
+			statusCode = "F";
+		}
+		else if(stationStatus.matches("Suppressed")){
+			statusCode = "S";
+		}		
+		return statusCode;
+	}
+	
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
+	}
 
 	private String parseStationNameShort(String stationName) {
 		String name;
@@ -96,8 +117,8 @@ public class StudentStation implements Serializable {
 	@Override
 	public String toString() {
 		String result = " Station Name:    " + stationName + "\n"
-				+ " Station ID:      " + stationID + "\n"
-				+ " Station Status:  " + stationStatus + "\n";
+				      + " Station ID:      " + stationID + "\n"
+				      + " Station Status:  " + stationStatus + "\n";
 		return result;
-	}
+	}	
 }

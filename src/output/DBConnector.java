@@ -44,6 +44,7 @@ public class DBConnector {
 			createConnection();
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error(e);
 		}	
 	}
 	
@@ -58,15 +59,28 @@ public class DBConnector {
 	}
 	
 	private void createConnection(){
+		logger.trace("*-----DBConnector is Creating DB Connection!-----*");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			this.con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + database, username, password);
 		} catch (SQLException e) {
 			e.printStackTrace();
+			logger.error(e);
 			error.fatalError(e.toString());			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+			logger.error(e);
 			error.fatalError(e.toString());	
+		}
+	}
+	
+	public void closeConnection(){
+		logger.trace("*-----DBConnector is Closing DB Connection!-----*");
+		try {
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 	
@@ -91,11 +105,11 @@ public class DBConnector {
 			}
 		} catch (SQLException ex) {
 			ex.printStackTrace();
+			logger.error(ex);
 		}
-		con.close();
 	}
 	
-	//writeToRunStatusTable
+	// Write To Run Status Table
 	public void writeToRunStatusTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Run Status Table!-----*");
 		try {
@@ -115,36 +129,51 @@ public class DBConnector {
 				stmt.executeUpdate(query);			
 		} catch (SQLException ex) {
 			ex.printStackTrace();
+			logger.error(ex);
 		}
-		con.close();
 	}
-	
-	/*
-	//writeToFlatTable
-	public void writeToFlatTable(ArrayList<Lab> labs) throws SQLException{
-		String mainQuery;
+
+	// Write To Flat Table 
+	public void writeToFlatTable(Lab lab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Flat Table!-----*");
+		
+		StringBuilder completeQuery = new StringBuilder();
+		String firstBit = "INSERT INTO FLAT (DATE, LAB, AVAILABLE, INUSE, OFFLINE, SUPPRESSED, TOTAL, DATA) VALUES (";
+		completeQuery.append(firstBit);
+		
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			String query = "INSERT INTO "
-					+ "RunStatus"
-					+ " (Lab, TotalUnits, Available, InUse, Offline, Suppressed, Date) "
-					+ " VALUES ('" 
-					+ currentLab.getLabName().toUpperCase()	+ "','" 
-					+ currentLab.getTotal() + "','"
-					+ currentLab.getAvail() + "','" 
-					+ currentLab.getInUse()	+ "','" 
-					+ currentLab.getOffline() + "','"
-					+ currentLab.getSuppressed() + "'," 
-					+ " NOW())";
-				logger.trace(query);
-				stmt.executeUpdate(query);			
+			String secondBit =  "NOW()" + ",'" 
+						        + lab.getLabName().toUpperCase() + "',"
+							    + lab.getAvail() + ","
+							    + lab.getInUse() + ","
+							    + lab.getOffline() + ","
+							    + lab.getSuppressed() + ","
+							    + lab.getTotal() + ","
+							    + "'(";
+			completeQuery.append(secondBit);
+			// iterate stations
+			for (int j = 0 ; j < lab.getTotal() ; j++){
+				String station = lab.getStations().get(j).getStatusCode();
+				if(j != lab.getTotal()-1){
+					completeQuery.append(station +",");
+				}
+				else if(j == lab.getTotal()-1){
+					completeQuery.append(station + ")')");
+				}					
+			}
+			logger.trace(completeQuery);
+			String query = completeQuery.toString();
+			stmt.executeUpdate(query);	
+			
 		} catch (SQLException ex) {
 			ex.printStackTrace();
+			logger.error(ex);
 		}
-		con.close();
 	}
-	*/
+
+	
+	
 	
 
 }

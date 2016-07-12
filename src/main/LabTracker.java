@@ -54,8 +54,6 @@ public class LabTracker {
 		// Program End
 		logger.trace("LabTracker has completed process, shutting down!!");
 
-		// Run DBConnector on Lab ArrayList
-		//System.out.println(labs.get(0));
 	}
 
 	public static void addLab(Lab lab) {

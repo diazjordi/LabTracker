@@ -32,7 +32,6 @@ public class HTMLScraper {
 	private Lab currentLab = new Lab();
 	private int threadSleep;
 	private int numberOfAttempts;
-	//private String scraperOutputPath = null; // no longer saving to file
 	private Boolean scrapeSuccess = false;
 	private String scrapedHTML = null;
 	private static Error error = Error.getErrorInstance();
@@ -48,7 +47,6 @@ public class HTMLScraper {
 		this.labURLs = propManager.getLabURLs();
 		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
 		this.numberOfAttempts = Integer.parseInt(scraperProperties.get("scraperNumberOfAttempts"));
-		//this.scraperOutputPath = scraperProperties.get("scraperOutputPath");  // no longer saving to file
 		
 		logger.trace("Properties Set, Starting Scraping Process!");
 		iterateURLsAndScrape();
