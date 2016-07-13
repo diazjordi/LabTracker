@@ -23,7 +23,7 @@ public class PropertyManager {
 	private static PropertyManager propertyManagerInstance;
 
 	// General properties path
-	private static String propertyFilePath = "/home/superlib/Desktop/LabTracker-Testing/Library-North/Properties/LabTrackerProps.properties";
+	private static String propertyFilePath = "/home/superlib/Desktop/LabTracker-Dev/Properties/LabTrackerProps.properties";
 	private static Properties mainProperties = new Properties();
 
 	// Scraper properties

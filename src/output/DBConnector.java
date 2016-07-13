@@ -39,12 +39,11 @@ public class DBConnector {
 	
 	
 	public DBConnector(){
-		try {
+		try{
 			getProps();
-		} catch (IOException e) {
+		}catch (IOException e){
 			e.printStackTrace();
-			logger.error(e);
-		}	
+		}
 	}
 	
 	private void getProps() throws IOException {
@@ -83,7 +82,6 @@ public class DBConnector {
 		}
 	}
 	
-	// Write To Lab Specific Table
 	public void writeToLabTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Lab Specific Table!-----*");
 		try {
@@ -97,7 +95,7 @@ public class DBConnector {
 						+ station.getStationStatus().toUpperCase() + "','"
 						+ station.getStationNameShort().toUpperCase() + "','"
 						+ station.getStationID().toUpperCase() + "','"
-						+ "NULL" //station.getStationOS() 
+						+ station.getStationOS() 
 						+ "', NOW())";
 				logger.trace(query);
 				stmt.executeUpdate(query);
@@ -108,7 +106,6 @@ public class DBConnector {
 		}
 	}
 	
-	// Write To Run Status Table
 	public void writeToRunStatusTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Run Status Table!-----*");
 		try {
@@ -132,7 +129,6 @@ public class DBConnector {
 		}
 	}
 
-	// Write To Flat Table 
 	public void writeToFlatTable(Lab lab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Flat Table!-----*");
 		

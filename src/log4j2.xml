@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
 <Configuration status="WARN">
 
 	<Properties>
-		<Property name="log-path">/home/superlib/Desktop/LabTracker/Library-North-1st/logging/log4j/</Property>
+		<Property name="log-path">/home/superlib/Desktop/LabTracker-Dev/Logging/</Property>
 	</Properties>
 
 
@@ -11,7 +12,7 @@
 			<PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>
 
-		<RollingFile name="labtracker-trace" 
+		<RollingFile name="LabTracker-Trace" 
 					 fileName="${log-path}/labtracker-trace.log"
 					 filePattern="${log-path}/labtracker-trace-%d{yyyy-MM-dd}-%i.log">
 			<PatternLayout>
@@ -23,7 +24,7 @@
 			<DefaultRolloverStrategy max="5" />
 		</RollingFile>
 		
-		<RollingFile name="labtracker-error" 
+		<RollingFile name="LabTracker-Error" 
 					 fileName="${log-path}/labtracker-error.log"
 					 filePattern="${log-path}/labtracker-error-%d{yyyy-MM-dd}-%i.log">
 			<PatternLayout>

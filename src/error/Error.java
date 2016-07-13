@@ -39,11 +39,9 @@ public class Error {
 		if (errorFileOutputPath != null) {
 			try {
 				File output = new File(errorFileOutputPath);
-				ObjectOutputStream listOutputStream = new ObjectOutputStream(
-						new FileOutputStream(output));
+				ObjectOutputStream listOutputStream = new ObjectOutputStream(new FileOutputStream(output));
 				if (errorInfo.isEmpty()) {
-					listOutputStream
-							.writeUTF("Error Detected in LabTracker, please review logs and delete this file to enable next run");
+					listOutputStream.writeUTF("Error Detected in LabTracker, please review logs and delete this file to enable next run");
 				} else {
 					System.out.println(errorInfo);
 					listOutputStream.writeUTF(errorInfo);
@@ -53,11 +51,11 @@ public class Error {
 				e.printStackTrace();
 			}
 		} else {
-			System.out
-					.println("No Error Output Path Set, program cannot continue!");
+			System.out.println("No Error Output Path Set, program cannot continue!");
 			System.out.println("Program will now terminate!");
 			System.exit(0);
 		}
+		//System.exit(0);
 	}
 
 	public void checkForErrorFile(String errorFileOutputPath) {

@@ -36,7 +36,6 @@ public class HTMLParser {
 	private String parserSuppressionFilePath = null;
 	private Integer parserReportingThreshold = 0;
 
-	//private Integer numUnits = 0;
 	private Integer numInUse = 0;
 	private Integer numAvail = 0;
 	private Integer numOffline = 0;
@@ -76,18 +75,18 @@ public class HTMLParser {
 		
 		logger.trace("Checking Error Reporting Threshold");
 		detectDataErrors();
+				
+		logger.trace("Writing Data To MySQL DB");
+		dbConnector.createConnection();
+		dbConnector.writeToLabTable(currentLab);
+		dbConnector.writeToRunStatusTable(currentLab);
+		dbConnector.writeToFlatTable(currentLab);
+		dbConnector.closeConnection();
 		
 		logger.trace("Creating HTML Map Page");
 		htmlCreator.setLab(currentLab);
 		htmlCreator.getProps();
-		//htmlCreator.writeMapOfStationsToHTML();
-		
-		logger.trace("Writing Data To MySQL DB");
-		//dbConnector.createConnection();
-		//dbConnector.writeToLabTable(currentLab);
-		//dbConnector.writeToRunStatusTable(currentLab);
-		//dbConnector.writeToFlatTable(currentLab);
-		//dbConnector.closeConnection();
+		htmlCreator.writeMapOfStationsToHTML();
 	}
 
 	private void getProps() throws IOException {
@@ -131,7 +130,7 @@ public class HTMLParser {
 			String stationName = stationNameDivs.get(k).text();
 			String stationID = statusDivs.get(k).id();
 			String status = getStationStatus(statusDivs.get(k).toString());
-			String OS = osImageDivs.get(k).toString();			
+			String OS = getStationOS(osImageDivs.get(k).toString());
 			StudentStation stu1 = new StudentStation(stationName, stationID, status, OS);
 			stations.add(k, stu1);
 		}
@@ -190,6 +189,18 @@ public class HTMLParser {
 			stationStatus = "Offline";
 		}
 		return stationStatus;
+	}
+	
+	private String getStationOS(String osDiv){
+		Pattern pat = Pattern.compile("(?<=/)(\\w*)(?=\\.png)");
+		Matcher mat = pat.matcher(osDiv);
+		String stationOS;
+		if (mat.find()) {
+			stationOS = mat.group().toString();
+		} else {
+			stationOS = "N/A";
+		}
+		return stationOS;
 	}
 
 	@SuppressWarnings("rawtypes")
