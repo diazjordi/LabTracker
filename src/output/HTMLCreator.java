@@ -13,88 +13,69 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import dataobjects.Lab;
 import dataobjects.StudentStation;
 import setup.PropertyManager;
 import error.Error;
 
 @SuppressWarnings("unused")
 public class HTMLCreator {
+	
+	private Lab lab;
 
-	// HTML Templates & Properties
 	private Map<String, String> htmlProperties = new HashMap<String, String>();
 
-	// Paths to HTML template pages
-	private String htmlListTemplateFilePath = null;
 	private String htmlMapTemplateFilePath = null;
-	// Paths to output HTML pages
-	private String htmlListOutputPath = null;
 	private String htmlMapOutputPath = null;
 
-	// Error Handling
 	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
-	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
+	
+	public HTMLCreator(){
+	}
 
-	// Get properties from prop files
-	private void getProps() throws IOException {
-		PropertyManager propManager = PropertyManager
-				.getPropertyManagerInstance();
+	public void getProps() throws IOException {
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		// Get props
 		this.htmlProperties = propManager.getHtmlProperties();
 		// Retrieve HTML props
-		this.htmlListTemplateFilePath = htmlProperties
-				.get("htmlListTemplateFilePath");
-		this.htmlListOutputPath = htmlProperties.get("htmlListOutputPath");
-		this.htmlMapTemplateFilePath = htmlProperties
-				.get("htmlMapTemplateFilePath");
-		this.htmlMapOutputPath = htmlProperties.get("htmlMapOutputPath");
+		this.htmlMapTemplateFilePath = htmlProperties.get("htmlMapTemplateFilePath") + lab.getLabName() + ".html";
+		this.htmlMapOutputPath = htmlProperties.get("htmlMapOutputPath") + lab.getLabName() + ".html";
 		// Eventually log all of these out
-		logger.trace("htmlListTemplateFilePath: " + htmlListTemplateFilePath);
-		logger.trace("htmlListOutputPath:       " + htmlListOutputPath);
 		logger.trace("htmlMapTemplateFilePath:  " + htmlMapTemplateFilePath);
 		logger.trace("htmlMapOutputPath:        " + htmlMapOutputPath);
 	}
-
+	
 	// Writes stations to HTML Map File
-	public void writeMapOfStationsToHTML(ArrayList<StudentStation> stuStations,
-			String avail, String inUse, String off) throws IOException {
-		getProps();
+	public void writeMapOfStationsToHTML() throws IOException{
 		File htmlMapTemplateFile = new File(htmlMapTemplateFilePath);
-		String htmlString = FileUtils.readFileToString(htmlMapTemplateFile);
+		String htmlString = FileUtils.readFileToString(htmlMapTemplateFile);			
 		// Color Strings
-		String availColor = "<FONT COLOR=\"#ffcb2f\">";
+		String availColor =    "<FONT COLOR=\"#ffcb2f\">";
 		String noStatusColor = "<FONT COLOR=\"#595138\">";
-		String inUseColor = "<FONT COLOR=\"#665113\">";
+		String inUseColor =    "<FONT COLOR=\"#665113\">";
 		// HTML Match Strings
 		String begMatch = "<!--$";
 		String endMatch = "-->";
-		//
-		Integer numAvail = 0;
-		Integer numUnits = 0;
-		for (StudentStation station : stuStations) {
+		Integer numAvail = lab.getAvail();
+		Integer numUnits = lab.getTotal();
+		Integer numInUse = lab.getInUse();
+		Integer numOffline = lab.getOffline();
+		for (StudentStation station : lab.getStations()) {
 			if (station.getStationStatus().matches("Available")) {
-				numAvail++;
-				numUnits++;
-				String completeMatch = begMatch + station.getStationNameShort()
-						+ endMatch;
+				String completeMatch = begMatch + station.getStationNameShort()	+ endMatch;
 				if (htmlString.contains(completeMatch)) {
 					htmlString = htmlString.replace(completeMatch, availColor);
 				}
-			}// Not currently displaying anything for In Use stations, leave
-				// blank
+			}
 			else if (station.getStationStatus().matches("InUse")) {
-				numUnits++;
-				String completeMatch = begMatch + station.getStationNameShort()
-						+ endMatch;
+				String completeMatch = begMatch + station.getStationNameShort()	+ endMatch;
 			} else {
-				numUnits++;
-				String completeMatch = begMatch + station.getStationNameShort()
-						+ endMatch;
+				String completeMatch = begMatch + station.getStationNameShort()	+ endMatch;
 				if (htmlString.contains(completeMatch)) {
-					htmlString = htmlString.replace(completeMatch,
-							noStatusColor);
+					htmlString = htmlString.replace(completeMatch,noStatusColor);
 				}
 			}
 		}
@@ -107,12 +88,32 @@ public class HTMLCreator {
 		htmlString = htmlString.replace("$date", date1);
 		htmlString = htmlString.replace("$numAvail", numAvail.toString());
 		htmlString = htmlString.replace("$numUnits", numUnits.toString());
-
+		
+		float percentAvail = (float) (numAvail / numUnits) * 100;
+		float percentInUse = (float) (numInUse / numUnits) * 100;
+		float percentOffline = (float) (numOffline / numUnits) * 100;
+		int percAvail = (int) percentAvail;
+		int percInUse = (int) percentInUse;
+		int percOffline = (int) percentOffline;
+		String avail = "(Available - " + numAvail   + ", " + numUnits + ")";
+		String inUse = "(In Use    - " + numInUse   + ", " + numUnits + ")";
+		String off = "(Offline   - "   + numOffline + ", " + numUnits + ")";
+		logger.trace(avail);
+		logger.trace(inUse);
+		logger.trace(off);
+		
 		htmlString = htmlString.replace("$availSummary", avail);
 		htmlString = htmlString.replace("$inUseSummary", inUse);
 		htmlString = htmlString.replace("$offSummary", off);
 		File newHtmlFile = new File(htmlMapOutputPath);
-		FileUtils.writeStringToFile(newHtmlFile, htmlString);
+		FileUtils.writeStringToFile(newHtmlFile, htmlString);			
+	}
+	
+	public Lab getLab() {
+		return lab;
 	}
 
+	public void setLab(Lab lab) {
+		this.lab = lab;
+	}
 }

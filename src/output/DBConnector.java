@@ -39,13 +39,11 @@ public class DBConnector {
 	
 	
 	public DBConnector(){
-		try {
+		try{
 			getProps();
-			createConnection();
-		} catch (IOException e) {
+		}catch (IOException e){
 			e.printStackTrace();
-			logger.error(e);
-		}	
+		}
 	}
 	
 	private void getProps() throws IOException {
@@ -58,7 +56,7 @@ public class DBConnector {
 		this.password = databaseProperties.get("db.password");
 	}
 	
-	private void createConnection(){
+	public void createConnection(){
 		logger.trace("*-----DBConnector is Creating DB Connection!-----*");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -84,7 +82,6 @@ public class DBConnector {
 		}
 	}
 	
-	// Write To Lab Specific Table
 	public void writeToLabTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Lab Specific Table!-----*");
 		try {
@@ -98,7 +95,7 @@ public class DBConnector {
 						+ station.getStationStatus().toUpperCase() + "','"
 						+ station.getStationNameShort().toUpperCase() + "','"
 						+ station.getStationID().toUpperCase() + "','"
-						+ "NULL" //station.getStationOS() 
+						+ station.getStationOS() 
 						+ "', NOW())";
 				logger.trace(query);
 				stmt.executeUpdate(query);
@@ -109,7 +106,6 @@ public class DBConnector {
 		}
 	}
 	
-	// Write To Run Status Table
 	public void writeToRunStatusTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Run Status Table!-----*");
 		try {
@@ -133,7 +129,6 @@ public class DBConnector {
 		}
 	}
 
-	// Write To Flat Table 
 	public void writeToFlatTable(Lab lab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Flat Table!-----*");
 		
