@@ -1,4 +1,4 @@
-package retrieval;
+package htmlhandling;
 
 import java.io.IOException;
 import java.net.UnknownHostException;

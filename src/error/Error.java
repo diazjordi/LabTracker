@@ -38,11 +38,12 @@ public class Error {
 		if (errorFileOutputPath != null) {
 			try {
 				File output = new File(errorFileOutputPath);
-				ObjectOutputStream listOutputStream = new ObjectOutputStream(new FileOutputStream(output));
+				FileOutputStream fOS = new FileOutputStream(output);
+				ObjectOutputStream listOutputStream = new ObjectOutputStream(fOS);
 				if (errorInfo.isEmpty()) {
 					listOutputStream.writeUTF("Error Detected in LabTracker, please review logs and delete this file to enable next run");
 				} else {
-					System.out.println(errorInfo);
+					logger.error(errorInfo);
 					listOutputStream.writeUTF(errorInfo);
 				}
 				listOutputStream.close();
@@ -54,7 +55,7 @@ public class Error {
 			System.out.println("Program will now terminate!");
 			System.exit(0);
 		}
-		//System.exit(0);
+		System.exit(0);
 	}
 
 	public void checkForErrorFile(String errorFileOutputPath) {

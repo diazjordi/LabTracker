@@ -1,4 +1,4 @@
-package retrieval;
+package htmlhandling;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -14,11 +14,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import output.DBConnector;
-import output.HTMLCreator;
 import setup.PropertyManager;
 import dataobjects.Lab;
 import dataobjects.StudentStation;
+import db.DBConnector;
 import error.Error;
 
 /**
@@ -161,7 +160,7 @@ public class HTMLParser {
 		double percentOffline = (double) numOffline / currentLab.getTotal();
 		if (percentOffline >= percentThreshold) {
 			errorInfo = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
-			logger.error(error);
+			logger.error(errorInfo);
 			error.fatalError(errorInfo);
 		}
 		// check for zero data error

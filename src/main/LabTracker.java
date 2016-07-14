@@ -1,5 +1,7 @@
 package main;
 
+import htmlhandling.HTMLScraper;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,7 +10,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import dataobjects.Lab;
-import retrieval.HTMLScraper;
 import setup.PropertyManager;
 import error.Error;
 
