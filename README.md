@@ -14,32 +14,18 @@ LabTracker
 	|		|
 	|		|-------Templates
 	|       		|
-	|       		|-------Maps
+	|       		|-------Maps - contains HTML templates for maps to be used as display output
 	|       		|
-	|       		|-------Offline
+	|       		|-------Offline - contains bash script to run at end of business day, and HTML 
+	|								  page to display during non operational hours 
 	|
-	|-------JARs
+	|-------JARs - contains JARs generated from code 
 	|
-	|-------Logging
+	|-------Logging - contains all loggins output as well as "ErrorFile"
 	|
-	|-------Properties
+	|-------Properties - contains LabTrackerProps and LabURLs property files
 	|
-	|-------Suppression
-```
-	
-	
-	/LabTracker/HTML/Templates/Maps - contains HTML templates for maps to be used as display output
-	(/LabTracker/HTML/Templates/Maps) - contains bash script to run at end of business day, and HTML 
-											 page to display during non operational hours          
-	
-	(/LabTracker/JARs) - contains JARs generated from code 
-	
-	(/LabTracker/Logging) - contains all loggins output as well as "ErrorFile"
-	
-	(/LabTracker/Properties) - contains LabTrackerProps and LabURLs property files
-	
-	(/LabTracker/Suppression) - contains list of stations to suppress in property file format
-	
-	
+	|-------Suppression - contains list of stations to suppress in property file format
+```	
 
-(Updated 07-11-16)
+(Updated 07-14-16)
