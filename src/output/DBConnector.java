@@ -133,12 +133,12 @@ public class DBConnector {
 		logger.trace("*-----DBConnector is Writing to Flat Table!-----*");
 		
 		StringBuilder completeQuery = new StringBuilder();
-		String firstBit = "INSERT INTO FLAT (DATE, LAB, AVAILABLE, INUSE, OFFLINE, SUPPRESSED, TOTAL, DATA) VALUES (";
+		String firstBit = "INSERT INTO FLAT (DATE, LAB, AVAILABLE, INUSE, OFFLINE, SUPPRESSED, TOTAL, DATA, END) VALUES (";
 		completeQuery.append(firstBit);
 		
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
-			String secondBit =  "NOW()" + ",'" 
+			String secondBit =    "NOW()" + ",'" 
 						        + lab.getLabName().toUpperCase() + "',"
 							    + lab.getAvail() + ","
 							    + lab.getInUse() + ","
@@ -154,13 +154,13 @@ public class DBConnector {
 					completeQuery.append(station +",");
 				}
 				else if(j == lab.getTotal()-1){
-					completeQuery.append(station + ")')");
+					completeQuery.append(station + ")'");
 				}					
 			}
+			completeQuery.append(",'" + lab.getLabName().toUpperCase() + "')");
 			logger.trace(completeQuery);
 			String query = completeQuery.toString();
-			stmt.executeUpdate(query);	
-			
+			stmt.executeUpdate(query);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 			logger.error(ex);

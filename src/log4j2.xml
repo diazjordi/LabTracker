@@ -13,8 +13,8 @@
 		</Console>
 
 		<RollingFile name="LabTracker-Trace" 
-					 fileName="${log-path}/labtracker-trace.log"
-					 filePattern="${log-path}/labtracker-trace-%d{yyyy-MM-dd}-%i.log">
+					 fileName="${log-path}/LabTracker-Trace.log"
+					 filePattern="${log-path}/LabTracker-Trace-%d{yyyy-MM-dd}-%i.log">
 			<PatternLayout>
 				<pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
 			</PatternLayout>
@@ -25,8 +25,8 @@
 		</RollingFile>
 		
 		<RollingFile name="LabTracker-Error" 
-					 fileName="${log-path}/labtracker-error.log"
-					 filePattern="${log-path}/labtracker-error-%d{yyyy-MM-dd}-%i.log">
+					 fileName="${log-path}/LabTracker-Error.log"
+					 filePattern="${log-path}/LabTracker-Error-%d{yyyy-MM-dd}-%i.log">
 			<PatternLayout>
 				<pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
 			</PatternLayout>
@@ -40,8 +40,8 @@
 
 	<Loggers>
 		<Logger name="LabTracker" level="trace" additivity="false">
-			<AppenderRef ref="labtracker-trace" level="trace"/>
-			<AppenderRef ref="labtracker-error" level="error"/>
+			<AppenderRef ref="LabTracker-Trace" level="trace"/>
+			<AppenderRef ref="LabTracker-Error" level="error"/>
 			<AppenderRef ref="Console" level="trace"/>
 		</Logger>
 		<Root level="error" additivity="false">

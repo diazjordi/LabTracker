@@ -13,7 +13,6 @@ public class Error {
 	private static Error errorInstance;
 	private static String errorFileOutputPath;
 
-	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
 
 	private Error() {

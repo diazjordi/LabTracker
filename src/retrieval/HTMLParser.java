@@ -90,16 +90,13 @@ public class HTMLParser {
 	}
 
 	private void getProps() throws IOException {
-		PropertyManager propManager = PropertyManager
-				.getPropertyManagerInstance();
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
 		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
 		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
-		logger.trace("Supression File Path:          "
-				+ parserSuppressionFilePath);
-		logger.trace("Parser Reporting Threshold:    "
-				+ parserReportingThreshold + "%");
+		logger.trace("Supression File Path:          " + parserSuppressionFilePath);
+		logger.trace("Parser Reporting Threshold:    " + parserReportingThreshold + "%");
 	}
 
 	/**
