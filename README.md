@@ -9,6 +9,7 @@ Will be implementing new features and DB schema.
 
 LabTracker Directory Structure
 
+```
 LabTracker
 	|       
 	|-------HTML
@@ -26,6 +27,7 @@ LabTracker
 	|-------Properties
 	|
 	|-------Suppression
+```
 	
 	
 	(/LabTracker/HTML/Templates/Maps) - contains HTML templates for maps to be used as display output
