@@ -21,7 +21,7 @@ LabTracker
 	|
 	|-------JARs - contains JARs generated from code 
 	|
-	|-------Logging - contains all loggins output as well as "ErrorFile"
+	|-------Logging - contains all logging output as well as "ErrorFile"
 	|
 	|-------Properties - contains LabTrackerProps and LabURLs property files
 	|
