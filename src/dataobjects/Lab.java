@@ -12,6 +12,7 @@ public class Lab {
 	private int offline;
 	private int suppressed;
 	private int total;
+	private boolean belowThreshold;
 
 	public Lab() {
 		super();
@@ -94,6 +95,14 @@ public class Lab {
 
 	public void setTotal(int total) {
 		this.total = total;
+	}
+	
+	public boolean isBelowThreshold() {
+		return belowThreshold;
+	}
+
+	public void setBelowThreshold(boolean belowThreshold) {
+		this.belowThreshold = belowThreshold;
 	}
 
 	@Override

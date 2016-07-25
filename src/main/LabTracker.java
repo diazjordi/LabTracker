@@ -48,6 +48,10 @@ public class LabTracker {
 		HTMLScraper scraper = new HTMLScraper();
 		scraper.run();
 		
+		// Check lab threshold
+		logger.trace("Checking number of labs below parser threshold");
+		labsBelowThreshold();
+		
 		// Program End
 		logger.trace("LabTracker has completed process, shutting down!!");
 		logger.trace("*************************************************");
@@ -59,5 +63,23 @@ public class LabTracker {
 
 	public static void addLab(Lab lab) {
 		LabTracker.labs.add(lab);
+	}
+	
+	public static boolean labsBelowThreshold(){
+		boolean below = false;
+		int numBelow = 0;
+		for(int i = 0 ; i < labs.size() ; i++){
+			if(labs.get(i).isBelowThreshold()){
+				numBelow++;
+			}
+		}
+		if(numBelow >= labs.size()/2){
+			below = true;
+			logger.trace("Too many labs below parser threshold!");
+			logger.error("Too many labs below parser threshold!");
+			error.fatalError("Too many labs below parser threshold!");
+		}
+		
+		return below;
 	}
 }

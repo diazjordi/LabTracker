@@ -18,7 +18,6 @@ import setup.PropertyManager;
 import dataobjects.Lab;
 import dataobjects.StudentStation;
 import db.DBConnector;
-import error.Error;
 
 /**
  * Created by Jordi Diaz on 12/22/14. Need to implement ability to read multiple
@@ -44,8 +43,6 @@ public class HTMLParser {
 	private Elements osImageDivs;
 
 	private ArrayList<StudentStation> stations = new ArrayList<StudentStation>();
-	
-	private static Error error = Error.getErrorInstance();
 	private static String errorInfo;
 
 	private DBConnector dbConnector = new DBConnector();
@@ -56,32 +53,32 @@ public class HTMLParser {
 	public void run(Lab currentLab) throws IOException, SQLException {
 		logger.trace("*-----HTMLParser Is Starting!-----*");
 		this.currentLab = currentLab;
-		
+
 		logger.trace("Retrieving Parser Properties");
 		getProps();
-		
+
 		logger.trace("Parsing HTML For Requested Data");
 		parseHTML();
-		
+
 		logger.trace("Creating Station Objects");
 		createStationObjects();
 		setCountVariables();
-		
+
 		logger.trace("Setting Suppressed Stations");
 		setSuppressedStations();
-		
+
 		LabTracker.addLab(currentLab);
-		
+
 		logger.trace("Checking Error Reporting Threshold");
-		detectDataErrors();
-				
+		detectDataThreshold();
+
 		logger.trace("Writing Data To MySQL DB");
 		dbConnector.createConnection();
 		dbConnector.writeToLabTable(currentLab);
 		dbConnector.writeToRunStatusTable(currentLab);
 		dbConnector.writeToFlatTable(currentLab);
 		dbConnector.closeConnection();
-		
+
 		logger.trace("Creating HTML Map Page");
 		htmlCreator.setLab(currentLab);
 		htmlCreator.getProps();
@@ -89,13 +86,18 @@ public class HTMLParser {
 	}
 
 	private void getProps() throws IOException {
-		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
+		PropertyManager propManager = PropertyManager
+				.getPropertyManagerInstance();
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
-		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
-		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
-		logger.trace("Supression File Path:          " + parserSuppressionFilePath);
-		logger.trace("Parser Reporting Threshold:    " + parserReportingThreshold + "%");
+		this.parserSuppressionFilePath = parserProperties
+				.get("parserSuppressionFilePath");
+		this.parserReportingThreshold = Integer.parseInt(parserProperties
+				.get("parserReportingThreshold"));
+		logger.trace("Supression File Path:          "
+				+ parserSuppressionFilePath);
+		logger.trace("Parser Reporting Threshold:    "
+				+ parserReportingThreshold + "%");
 	}
 
 	/**
@@ -127,47 +129,11 @@ public class HTMLParser {
 			String stationID = statusDivs.get(k).id();
 			String status = getStationStatus(statusDivs.get(k).toString());
 			String OS = getStationOS(osImageDivs.get(k).toString());
-			StudentStation stu1 = new StudentStation(stationName, stationID, status, OS);
+			StudentStation stu1 = new StudentStation(stationName, stationID,
+					status, OS);
 			stations.add(k, stu1);
 		}
 		currentLab.setStations(stations);
-	}
-
-	private void setCountVariables() {
-		for (StudentStation station : stations) {
-			if (station.getStationStatus().matches("Available")) {
-				numAvail++;
-			} else if (station.getStationStatus().matches("InUse")) {
-				numInUse++;
-			} else if (station.getStationStatus().matches("Offline")) {
-				numOffline++;
-			}
-		}
-		currentLab.setInUse(numInUse);
-		currentLab.setAvail(numAvail);
-		currentLab.setOffline(numOffline);
-		currentLab.setTotalInternally();
-		logger.trace("Number of Available: "   + numAvail);
-		logger.trace("Number of In Use: "      + numInUse);
-		logger.trace("Number of Offline: "     + numOffline);
-		logger.trace("Total Number of Units: " + currentLab.getTotal());
-	}
-
-	private void detectDataErrors() {
-		// check if num of stations offline/ not reporting is above acceptable
-		// threshold
-		double percentThreshold = (double) parserReportingThreshold / 100;
-		double percentOffline = (double) numOffline / currentLab.getTotal();
-		if (percentOffline >= percentThreshold) {
-			errorInfo = "Number of units reporting Offline is above threshold, LabTracker will shut down until manually restarted!";
-			logger.error(errorInfo);
-			error.fatalError(errorInfo);
-		}
-		// check for zero data error
-		if (numAvail == 0 && numInUse == 0 && numOffline == 0) {
-			logger.trace("Detected zero data error, will continue with next scheduled");
-			logger.trace("run but will denote error in DB RunStatus.");
-		}
 	}
 
 	private String getStationStatus(String statusDiv) {
@@ -186,8 +152,8 @@ public class HTMLParser {
 		}
 		return stationStatus;
 	}
-	
-	private String getStationOS(String osDiv){
+
+	private String getStationOS(String osDiv) {
 		Pattern pat = Pattern.compile("(?<=/)(\\w*)(?=\\.png)");
 		Matcher mat = pat.matcher(osDiv);
 		String stationOS;
@@ -199,6 +165,26 @@ public class HTMLParser {
 		return stationOS;
 	}
 
+	private void setCountVariables() {
+		for (StudentStation station : stations) {
+			if (station.getStationStatus().matches("Available")) {
+				numAvail++;
+			} else if (station.getStationStatus().matches("InUse")) {
+				numInUse++;
+			} else if (station.getStationStatus().matches("Offline")) {
+				numOffline++;
+			}
+		}
+		currentLab.setInUse(numInUse);
+		currentLab.setAvail(numAvail);
+		currentLab.setOffline(numOffline);
+		currentLab.setTotalInternally();
+		logger.trace("Number of Available: " + numAvail);
+		logger.trace("Number of In Use: " + numInUse);
+		logger.trace("Number of Offline: " + numOffline);
+		logger.trace("Total Number of Units: " + currentLab.getTotal());
+	}
+
 	@SuppressWarnings("rawtypes")
 	private void setSuppressedStations() {
 		int numSup = 0;
@@ -206,14 +192,32 @@ public class HTMLParser {
 			Iterator<?> it = suppressionProperties.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry pair = (Map.Entry) it.next();
-				if (stations.get(i).getStationName().matches(pair.getValue().toString())) {
+				if (stations.get(i).getStationName()
+						.matches(pair.getValue().toString())) {
 					stations.get(i).setStationStatus("Suppressed");
 					numSup += 1;
 				}
 			}
 		}
 		currentLab.setSuppressed(numSup);
-		currentLab.setTotal(currentLab.getTotal()-currentLab.getSuppressed());
+		currentLab.setTotal(currentLab.getTotal() - currentLab.getSuppressed());
+	}
+
+	private void detectDataThreshold() {
+		// check if num of stations offline/ not reporting is above acceptable
+		// threshold
+		double percentThreshold = (double) parserReportingThreshold / 100;
+		double percentOffline = (double) numOffline / currentLab.getTotal();
+		if (percentOffline >= percentThreshold) {
+			errorInfo = "Number of units for lab " + currentLab.getLabName()
+					+ " reporting Offline is above threshold!";
+			logger.error(errorInfo);
+			currentLab.setBelowThreshold(true);
+		}
+		// check for zero data error
+		if (numAvail == 0 && numInUse == 0 && numOffline == 0) {
+			logger.trace("Detected zero data error, will continue with next scheduled run");
+		}
 	}
 
 }
