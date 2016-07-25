@@ -18,14 +18,11 @@ import error.Error;
 // and change log output path in log4j2.xml
 public class LabTracker {
 
-	// Singleton PropertyManager
 	private static PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 
-	// Singleton Error Handling
 	private static Error error = Error.getErrorInstance();
 	private static String errorFileOutputPath;
 
-	// Logger
 	private static final Logger logger = LogManager.getLogger("LabTracker");
 
 	private static ArrayList<Lab> labs = new ArrayList<Lab>();
@@ -53,6 +50,10 @@ public class LabTracker {
 		
 		// Program End
 		logger.trace("LabTracker has completed process, shutting down!!");
+		logger.trace("*************************************************");
+		logger.trace("*************************************************");
+		logger.trace("*************************************************");
+		logger.trace("*************************************************");
 
 	}
 

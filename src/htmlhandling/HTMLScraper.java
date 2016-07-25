@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -31,6 +32,8 @@ public class HTMLScraper {
 	private Map<String, String> labURLs = new HashMap<String, String>();
 	private Lab currentLab = new Lab();
 	private int threadSleep;
+	private int threadSleepMin;
+	private int threadSleepMax;	
 	private int numberOfAttempts;
 	private Boolean scrapeSuccess = false;
 	private String scrapedHTML = null;
@@ -45,13 +48,20 @@ public class HTMLScraper {
 		this.scraperProperties = propManager.getScraperProperties();
 		
 		this.labURLs = propManager.getLabURLs();
-		this.threadSleep = Integer.parseInt(scraperProperties.get("scraperThreadSleep"));
+		this.threadSleepMin = Integer.parseInt(scraperProperties.get("scraperThreadSleepMin"));
+		this.threadSleepMax = Integer.parseInt(scraperProperties.get("scraperThreadSleepMax"));
 		this.numberOfAttempts = Integer.parseInt(scraperProperties.get("scraperNumberOfAttempts"));
-		
+		calculateThreadSleep();		
 		logger.trace("Properties Set, Starting Scraping Process!");
 		iterateURLsAndScrape();
 	}
 
+	private void calculateThreadSleep(){
+		Random ran = new Random();
+		int threadSleep = ran.nextInt(threadSleepMax-threadSleepMin) + threadSleepMin;		
+		this.threadSleep = threadSleep;
+		System.out.println(this.threadSleep);
+	}
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {
 		Iterator<Entry<String, String>> it = labURLs.entrySet().iterator();
 		while (it.hasNext()) {
