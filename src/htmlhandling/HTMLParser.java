@@ -213,6 +213,7 @@ public class HTMLParser {
 			}
 		}
 		currentLab.setSuppressed(numSup);
+		currentLab.setTotal(currentLab.getTotal()-currentLab.getSuppressed());
 	}
 
 }

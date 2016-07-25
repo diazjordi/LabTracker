@@ -58,9 +58,9 @@ public class HTMLScraper {
 
 	private void calculateThreadSleep(){
 		Random ran = new Random();
-		int threadSleep = ran.nextInt(threadSleepMax-threadSleepMin) + threadSleepMin;		
+		int threadSleep = ran.nextInt(threadSleepMax - threadSleepMin) + threadSleepMin;		
 		this.threadSleep = threadSleep;
-		System.out.println(this.threadSleep);
+		logger.trace("Thread Sleep for current run is: " + this.threadSleep);
 	}
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {
 		Iterator<Entry<String, String>> it = labURLs.entrySet().iterator();
