@@ -18,7 +18,8 @@ import error.Error;
 // and change log output path in log4j2.xml
 public class LabTracker {
 
-	private static PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
+	private static PropertyManager propManager = PropertyManager
+			.getPropertyManagerInstance();
 
 	private static Error error = Error.getErrorInstance();
 	private static String errorFileOutputPath;
@@ -27,15 +28,15 @@ public class LabTracker {
 
 	private static ArrayList<Lab> labs = new ArrayList<Lab>();
 
-	public static void main(String[] args) throws IOException, SQLException,
-			InterruptedException {
+	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 
 		logger.trace("*-----LabTracker Is Starting!-----*");
 		logger.trace("Loading Property Manager");
 		propManager.loadProps();
 
 		logger.trace("Setting Error Properties");
-		errorFileOutputPath = propManager.getErrorProperties().get("errorFileOutputPath");
+		errorFileOutputPath = propManager.getErrorProperties().get(
+				"errorFileOutputPath");
 		error.setErrorFileOutputPath(errorFileOutputPath);
 
 		// Check for Error File, if exists error out of program
@@ -47,11 +48,11 @@ public class LabTracker {
 		logger.trace("Initiating HTMLScraper");
 		HTMLScraper scraper = new HTMLScraper();
 		scraper.run();
-		
+
 		// Check lab threshold
 		logger.trace("Checking number of labs below parser threshold");
 		labsBelowThreshold();
-		
+
 		// Program End
 		logger.trace("LabTracker has completed process, shutting down!!");
 		logger.trace("*************************************************");
@@ -64,22 +65,22 @@ public class LabTracker {
 	public static void addLab(Lab lab) {
 		LabTracker.labs.add(lab);
 	}
-	
-	public static boolean labsBelowThreshold(){
+
+	public static boolean labsBelowThreshold() {
 		boolean below = false;
 		int numBelow = 0;
-		for(int i = 0 ; i < labs.size() ; i++){
-			if(labs.get(i).isBelowThreshold()){
+		for (int i = 0; i < labs.size(); i++) {
+			if (labs.get(i).isBelowThreshold()) {
 				numBelow++;
 			}
 		}
-		if(numBelow >= labs.size()/2){
+		if (numBelow >= labs.size() / 2) {
 			below = true;
 			logger.trace("Too many labs below parser threshold!");
 			logger.error("Too many labs below parser threshold!");
-			error.fatalError("Too many labs below parser threshold!");
+			// error.fatalError("Too many labs below parser threshold!");
 		}
-		
+
 		return below;
 	}
 }
