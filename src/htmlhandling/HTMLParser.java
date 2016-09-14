@@ -37,6 +37,7 @@ public class HTMLParser {
 	private Integer numInUse = 0;
 	private Integer numAvail = 0;
 	private Integer numOffline = 0;
+	private Integer numSuppressed = 0;
 
 	private Elements stationNameDivs;
 	private Elements statusDivs;
@@ -62,23 +63,23 @@ public class HTMLParser {
 
 		logger.trace("Creating Station Objects");
 		createStationObjects();
-		setCountVariables();
 
 		logger.trace("Setting Suppressed Stations");
 		setSuppressedStations();
+		setCountVariables();
 
-		LabTracker.addLab(currentLab);
+//		LabTracker.addLab(currentLab);
 
-		logger.trace("Checking Error Reporting Threshold");
-		detectDataThreshold();
-
-		logger.trace("Writing Data To MySQL DB");
-		dbConnector.createConnection();
-		dbConnector.writeToLabTable(currentLab);
-		dbConnector.writeToRunStatusTable(currentLab);
-		dbConnector.writeToFlatTable(currentLab);
-		dbConnector.closeConnection();
-
+//		logger.trace("Checking Error Reporting Threshold");
+//		detectDataThreshold();
+//
+//		logger.trace("Writing Data To MySQL DB");
+//		dbConnector.createConnection();
+//		dbConnector.writeToLabTable(currentLab);
+//		dbConnector.writeToRunStatusTable(currentLab);
+//		dbConnector.writeToFlatTable(currentLab);
+//		dbConnector.closeConnection();
+//
 		logger.trace("Creating HTML Map Page");
 		htmlCreator.setLab(currentLab);
 		htmlCreator.getProps();
@@ -86,18 +87,13 @@ public class HTMLParser {
 	}
 
 	private void getProps() throws IOException {
-		PropertyManager propManager = PropertyManager
-				.getPropertyManagerInstance();
+		PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 		this.parserProperties = propManager.getParserProperties();
 		this.suppressionProperties = propManager.getSuppressionProperties();
-		this.parserSuppressionFilePath = parserProperties
-				.get("parserSuppressionFilePath");
-		this.parserReportingThreshold = Integer.parseInt(parserProperties
-				.get("parserReportingThreshold"));
-		logger.trace("Supression File Path:          "
-				+ parserSuppressionFilePath);
-		logger.trace("Parser Reporting Threshold:    "
-				+ parserReportingThreshold + "%");
+		this.parserSuppressionFilePath = parserProperties.get("parserSuppressionFilePath");
+		this.parserReportingThreshold = Integer.parseInt(parserProperties.get("parserReportingThreshold"));
+		logger.trace("Supression File Path:          " + parserSuppressionFilePath);
+		logger.trace("Parser Reporting Threshold:    " + parserReportingThreshold + "%");
 	}
 
 	/**
@@ -125,13 +121,12 @@ public class HTMLParser {
 	private void createStationObjects() {
 		// Iterates through divs containing station ID info
 		for (int k = 0; k < stationNameDivs.size(); k++) {
-			String stationName = stationNameDivs.get(k).text();
+			String stationName = stationNameDivs.get(k).text().toLowerCase();
 			String stationID = statusDivs.get(k).id();
 			String status = getStationStatus(statusDivs.get(k).toString());
 			String OS = getStationOS(osImageDivs.get(k).toString());
-			StudentStation stu1 = new StudentStation(stationName, stationID,
-					status, OS);
-			stations.add(k, stu1);
+			StudentStation stu = new StudentStation(stationName, stationID, status, OS);
+			stations.add(k, stu);
 		}
 		currentLab.setStations(stations);
 	}
@@ -139,18 +134,35 @@ public class HTMLParser {
 	private String getStationStatus(String statusDiv) {
 		Pattern pat = Pattern.compile("(?<=Computer-01-)(\\w*)(?=\\.png)");
 		Matcher mat = pat.matcher(statusDiv);
-		String stationStatus;
+		String stationStatus = null;
 		if (mat.find()) {
 			stationStatus = mat.group().toString();
 			if (stationStatus.matches("InUse")) {
 				stationStatus = "InUse";
 			} else if (stationStatus.matches("PoweredOn")) {
 				stationStatus = "Available";
-			}
-		} else {
-			stationStatus = "Offline";
+			} else if (stationStatus.matches("Offline")) {
+				stationStatus = "Offline";
+			} 
 		}
 		return stationStatus;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private void setSuppressedStations() {
+		for (int i = 0; i < stations.size(); i++) {
+			Iterator<?> it = suppressionProperties.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry) it.next();
+				if(pair.getValue().toString().matches(currentLab.getLabName())){ // match value to currentlab
+					if(pair.getKey().toString().toLowerCase().matches(stations.get(i).getStationName().toLowerCase())){ // match key to station
+						stations.get(i).setStationStatus("Suppressed");
+						numSuppressed += 1;						
+					}
+				}
+			}
+		}
+		currentLab.setSuppressed(numSuppressed);
 	}
 
 	private String getStationOS(String osDiv) {
@@ -178,30 +190,15 @@ public class HTMLParser {
 		currentLab.setInUse(numInUse);
 		currentLab.setAvail(numAvail);
 		currentLab.setOffline(numOffline);
-		currentLab.setTotalInternally();
+		currentLab.setTotal(stations.size() - numSuppressed);
 		logger.trace("Number of Available: " + numAvail);
 		logger.trace("Number of In Use: " + numInUse);
 		logger.trace("Number of Offline: " + numOffline);
+		logger.trace("Number of Suppressed: " + numSuppressed);
 		logger.trace("Total Number of Units: " + currentLab.getTotal());
 	}
 
-	@SuppressWarnings("rawtypes")
-	private void setSuppressedStations() {
-		int numSup = 0;
-		for (int i = 0; i < stations.size(); i++) {
-			Iterator<?> it = suppressionProperties.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry pair = (Map.Entry) it.next();
-				if (stations.get(i).getStationName()
-						.matches(pair.getValue().toString())) {
-					stations.get(i).setStationStatus("Suppressed");
-					numSup += 1;
-				}
-			}
-		}
-		currentLab.setSuppressed(numSup);
-		currentLab.setTotal(currentLab.getTotal() - currentLab.getSuppressed());
-	}
+	
 
 	private void detectDataThreshold() {
 		// check if num of stations offline/ not reporting is above acceptable

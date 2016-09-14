@@ -18,8 +18,7 @@ import error.Error;
 // and change log output path in log4j2.xml
 public class LabTracker {
 
-	private static PropertyManager propManager = PropertyManager
-			.getPropertyManagerInstance();
+	private static PropertyManager propManager = PropertyManager.getPropertyManagerInstance();
 
 	private static Error error = Error.getErrorInstance();
 	private static String errorFileOutputPath;
@@ -51,7 +50,7 @@ public class LabTracker {
 
 		// Check lab threshold
 		logger.trace("Checking number of labs below parser threshold");
-		labsBelowThreshold();
+		//labsBelowThreshold();
 
 		// Program End
 		logger.trace("LabTracker has completed process, shutting down!!");

@@ -19,16 +19,14 @@ public class StudentStation implements Serializable {
 	private String os;
 	private String statusCode;
 	
-	public StudentStation(String stationNameIn, String stationIDIn,
-			String stationStatusIn) {
+	public StudentStation(String stationNameIn, String stationIDIn,	String stationStatusIn) {
 		this.stationName = stationNameIn;
 		this.stationNameShort = parseStationNameShort(stationNameIn);
 		this.stationID = stationIDIn;
 		this.stationStatus = stationStatusIn;
 	}
 
-	public StudentStation(String stationNameIn, String stationIDIn,
-			String stationStatusIn, String osIN) {
+	public StudentStation(String stationNameIn, String stationIDIn,	String stationStatusIn, String osIN) {
 		this.stationName = stationNameIn;
 		this.stationNameShort = parseStationNameShort(stationNameIn);
 		this.stationID = stationIDIn;
@@ -99,15 +97,15 @@ public class StudentStation implements Serializable {
 
 	private String parseStationNameShort(String stationName) {
 		String name;
-		Pattern pat = Pattern.compile("(?<=ec-\\w)(\\w*)(?=-ln)");// old pattern
+		//Pattern pat = Pattern.compile("(?<=ec-\\w)(\\w*)(?=-ln)");// old pattern
+		//Matcher mat = pat.matcher(stationName);
+		Pattern pat = Pattern.compile("(?<=\\w{2}-\\w{6}-\\w)(\\w*)");// new pattern
 		Matcher mat = pat.matcher(stationName);
-		Pattern pat2 = Pattern.compile("(?<=\\w{2}-\\w{6}-\\w)(\\w*)");// new
-																		// pattern
-		Matcher mat2 = pat2.matcher(stationName);
+		
 		if (mat.find()) {
 			name = mat.group().toString();
-		} else if (mat2.find()) {
-			name = mat2.group().toString();
+		} else if (mat.find()) {
+			name = mat.group().toString();
 		} else {
 			name = this.stationName;
 		}
