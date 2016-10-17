@@ -126,7 +126,7 @@ public class DBConnector {
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 			logger.error(ex);
-		}
+		}			
 	}
 
 	public void writeToFlatTable(Lab lab) throws SQLException{

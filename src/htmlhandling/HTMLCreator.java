@@ -42,7 +42,7 @@ public class HTMLCreator {
 		this.htmlProperties = propManager.getHtmlProperties();
 		// Retrieve HTML props
 		this.htmlMapTemplateFilePath = htmlProperties.get("htmlMapTemplateFilePath") + lab.getLabName() + ".html";
-		this.htmlMapOutputPath = htmlProperties.get("htmlMapOutputPath") + lab.getLabName() + ".html";
+		this.htmlMapOutputPath = htmlProperties.get("htmlMapOutputPath") + lab.getLabName() + ".php";
 		// Eventually log all of these out
 		logger.trace("htmlMapTemplateFilePath:  " + htmlMapTemplateFilePath);
 		logger.trace("htmlMapOutputPath:        " + htmlMapOutputPath);

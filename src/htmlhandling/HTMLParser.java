@@ -68,18 +68,18 @@ public class HTMLParser {
 		setSuppressedStations();
 		setCountVariables();
 
-//		LabTracker.addLab(currentLab);
+		LabTracker.addLab(currentLab);
 
-//		logger.trace("Checking Error Reporting Threshold");
-//		detectDataThreshold();
-//
-//		logger.trace("Writing Data To MySQL DB");
-//		dbConnector.createConnection();
-//		dbConnector.writeToLabTable(currentLab);
-//		dbConnector.writeToRunStatusTable(currentLab);
-//		dbConnector.writeToFlatTable(currentLab);
-//		dbConnector.closeConnection();
-//
+		logger.trace("Checking Error Reporting Threshold");
+		detectDataThreshold();
+
+		logger.trace("Writing Data To MySQL DB");
+		dbConnector.createConnection();
+		dbConnector.writeToLabTable(currentLab);
+		dbConnector.writeToRunStatusTable(currentLab);
+		dbConnector.writeToFlatTable(currentLab);
+		dbConnector.closeConnection();
+
 		logger.trace("Creating HTML Map Page");
 		htmlCreator.setLab(currentLab);
 		htmlCreator.getProps();
@@ -154,8 +154,8 @@ public class HTMLParser {
 			Iterator<?> it = suppressionProperties.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry pair = (Map.Entry) it.next();
-				if(pair.getValue().toString().matches(currentLab.getLabName())){ // match value to currentlab
-					if(pair.getKey().toString().toLowerCase().matches(stations.get(i).getStationName().toLowerCase())){ // match key to station
+				if(pair.getKey().toString().contains(currentLab.getLabName())){ // match key to currentlab
+					if(pair.getValue().toString().toLowerCase().matches(stations.get(i).getStationName().toLowerCase())){ // match value to station
 						stations.get(i).setStationStatus("Suppressed");
 						numSuppressed += 1;						
 					}
@@ -198,16 +198,13 @@ public class HTMLParser {
 		logger.trace("Total Number of Units: " + currentLab.getTotal());
 	}
 
-	
-
 	private void detectDataThreshold() {
 		// check if num of stations offline/ not reporting is above acceptable
 		// threshold
 		double percentThreshold = (double) parserReportingThreshold / 100;
 		double percentOffline = (double) numOffline / currentLab.getTotal();
 		if (percentOffline >= percentThreshold) {
-			errorInfo = "Number of units for lab " + currentLab.getLabName()
-					+ " reporting Offline is above threshold!";
+			errorInfo = "Number of units for lab " + currentLab.getLabName() + " reporting Offline is above threshold!";
 			logger.error(errorInfo);
 			currentLab.setBelowThreshold(true);
 		}

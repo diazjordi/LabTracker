@@ -53,9 +53,9 @@ public class Error {
 		} else {
 			System.out.println("No Error Output Path Set, program cannot continue!");
 			System.out.println("Program will now terminate!");
-			System.exit(0);
+			//System.exit(0);
 		}
-		System.exit(0);
+		//System.exit(0);
 	}
 
 	public void checkForErrorFile(String errorFileOutputPath) {
