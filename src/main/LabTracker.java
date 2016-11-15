@@ -61,7 +61,8 @@ public class LabTracker {
 		logger.trace("                                                 ");
 		logger.trace("                                                 ");
 		logger.trace("                                                 ");
-
+		
+		System.exit(0);
 	}
 
 	public static void addLab(Lab lab) {

@@ -76,7 +76,7 @@ public class HTMLParser {
 		logger.trace("Writing Data To MySQL DB");
 		dbConnector.createConnection();
 		dbConnector.writeToLabTable(currentLab);
-		dbConnector.writeToRunStatusTable(currentLab);
+		dbConnector.writeToLatestRunTable(currentLab);
 		dbConnector.writeToFlatTable(currentLab);
 		dbConnector.closeConnection();
 

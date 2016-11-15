@@ -62,6 +62,7 @@ public class HTMLScraper {
 		this.threadSleep = threadSleep;
 		logger.trace("Thread Sleep for current run is: " + this.threadSleep);
 	}
+	
 	private void iterateURLsAndScrape() throws IOException, InterruptedException, SQLException {
 		Iterator<Entry<String, String>> it = labURLs.entrySet().iterator();
 		while (it.hasNext()) {

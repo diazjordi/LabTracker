@@ -106,12 +106,12 @@ public class DBConnector {
 		}
 	}
 	
-	public void writeToRunStatusTable(Lab currentLab) throws SQLException{
+	public void writeToLatestRunTable(Lab currentLab) throws SQLException{
 		logger.trace("*-----DBConnector is Writing to Run Status Table!-----*");
 		try {
 			Statement stmt = (com.mysql.jdbc.Statement) con.createStatement();
 			String query = "INSERT INTO "
-					+ "RunStatus"
+					+ "LatestRun"
 					+ " (Lab, TotalUnits, Available, InUse, Offline, Suppressed, Date) "
 					+ " VALUES ('" 
 					+ currentLab.getLabName().toUpperCase()	+ "','" 
@@ -166,9 +166,5 @@ public class DBConnector {
 			logger.error(ex);
 		}
 	}
-
-	
-	
-	
 
 }
